@@ -29,46 +29,47 @@ export default function Catalog() {
   };
 
   const chip = (active) =>
-    `rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors ${
+    `shrink-0 rounded-full border px-4 py-1.5 text-sm transition-colors ${
       active
-        ? 'border-blue-600 bg-blue-600 text-white'
-        : 'border-slate-300 bg-white text-slate-700 hover:border-blue-600 hover:text-blue-600'
+        ? 'border-slate-900 bg-slate-900 text-white'
+        : 'border-slate-200 text-slate-600 hover:border-slate-900 hover:text-slate-900'
     }`;
 
+  const title = rawSearch ? `Resultados para "${rawSearch}"` : (category ?? 'Todos os produtos');
+
   return (
-    <div className="pb-16">
-      <h1 className="mb-6 text-2xl font-black">
-        {rawSearch ? `Resultados para "${rawSearch}"` : (category ?? 'Todos os produtos')}
-      </h1>
-
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-wrap gap-2">
-          <button onClick={() => selectCategory(null)} className={chip(!category)}>Todos</button>
-          {categories.map((cat) => (
-            <button key={cat} onClick={() => selectCategory(cat)} className={chip(category === cat)}>
-              {cat}
-            </button>
-          ))}
+    <div className="pb-20">
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+          <p className="mt-1 text-sm text-slate-500">{visible.length} produtos</p>
         </div>
 
-        <div className="flex items-center gap-3 text-sm">
-          <span className="text-slate-500">{visible.length} produtos</span>
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
-          >
-            <option value="relevance">Relevância</option>
-            <option value="price-asc">Menor preço</option>
-            <option value="price-desc">Maior preço</option>
-          </select>
-        </div>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          aria-label="Ordenar produtos"
+          className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 outline-none hover:border-slate-900"
+        >
+          <option value="relevance">Relevância</option>
+          <option value="price-asc">Menor preço</option>
+          <option value="price-desc">Maior preço</option>
+        </select>
+      </div>
+
+      <div className="mb-8 flex gap-2 overflow-x-auto pb-1 scrollbar-width:none">
+        <button onClick={() => selectCategory(null)} className={chip(!category)}>Todos</button>
+        {categories.map((cat) => (
+          <button key={cat} onClick={() => selectCategory(cat)} className={chip(category === cat)}>
+            {cat}
+          </button>
+        ))}
       </div>
 
       {visible.length === 0 ? (
         <p className="py-20 text-center text-slate-500">Nenhum produto encontrado.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-3 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
           {visible.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
