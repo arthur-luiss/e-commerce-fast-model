@@ -25,7 +25,7 @@ export default function Home() {
         </div>
       </nav>
 
-      <div className="mx-auto max-w-6xl space-y-12 px-4 py-12">
+      <div className="max-w-7xl space-y-12 px-6 py-12">
         <section>
           <h2 className="mb-4 text-xl font-bold">Compre por categoria</h2>
           <div className="flex flex-wrap gap-3">

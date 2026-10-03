@@ -16,9 +16,9 @@ function Layout() {
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-200">
+    <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-slate-200">
       <Navbar overHero={isHome} />
-      <main className={isHome ? '' : 'mx-auto max-w-6xl px-4 pt-120px md:pt-168px'}>
+      <main className={isHome ? '' : 'mx-auto max-w-7xl px-6 pt-88px md:pt-128px'}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/catalogo" element={<Catalog />} />
