@@ -7,7 +7,7 @@ export default function ProductCard({ product }) {
 
   return (
     <Link to={`/produto/${id}`} className="group block">
-      <div className="relative aspect-3/4 overflow-hidden rounded-lg bg-slate-200">
+      <div className="relative aspect-3/4 overflow-hidden bg-slate-100">
         <img
           src={image}
           alt={title}
@@ -15,25 +15,23 @@ export default function ProductCard({ product }) {
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {discount > 0 && (
-          <span className="absolute left-2 top-2 rounded bg-blue-600 px-2 py-1 text-xs font-bold text-white">
+          <span className="absolute left-2 top-2 rounded bg-slate-900 px-1.5 py-0.5 text-[11px] font-semibold text-white">
             -{discount}%
           </span>
         )}
-        <div className="absolute inset-x-0 bottom-0 translate-y-full bg-white/90 p-2 text-center text-xs font-medium text-slate-600 transition-transform group-hover:translate-y-0">
-          Tamanhos: {sizes.join(' · ')}
+        <div className="absolute inset-x-0 bottom-0 translate-y-full bg-white/95 py-2 text-center text-xs text-slate-600 transition-transform duration-300 group-hover:translate-y-0">
+          {sizes.join('  ·  ')}
         </div>
       </div>
 
-      <div className="mt-3 space-y-1">
-        <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{brand}</p>
-        <h3 className="line-clamp-2 text-sm font-medium text-slate-800">{title}</h3>
-        <div className="flex items-baseline gap-2">
-          <span className="text-base font-bold text-slate-900">{formatBRL(price)}</span>
-          {oldPrice && (
-            <span className="text-xs text-slate-400 line-through">{formatBRL(oldPrice)}</span>
-          )}
+      <div className="mt-3 space-y-0.5">
+        <p className="text-[11px] uppercase tracking-wider text-slate-400">{brand}</p>
+        <h3 className="line-clamp-1 text-sm text-slate-800">{title}</h3>
+        <div className="flex items-baseline gap-2 pt-1">
+          <span className="text-sm font-semibold">{formatBRL(price)}</span>
+          {oldPrice && <span className="text-xs text-slate-400 line-through">{formatBRL(oldPrice)}</span>}
         </div>
-        <p className="text-xs text-slate-500">até 6x de {formatBRL(price / 6)}</p>
+        <p className="text-xs text-slate-400">6x de {formatBRL(price / 6)}</p>
       </div>
     </Link>
   );
