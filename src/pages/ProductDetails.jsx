@@ -34,7 +34,7 @@ function ProductView({ product }) {
       </Link>
 
       <div className="mt-6 grid gap-10 md:grid-cols-2">
-        <div className="aspect-[3/4] overflow-hidden rounded-xl bg-slate-200">
+        <div className="aspect-3/4 overflow-hidden rounded-xl bg-slate-200">
           <img src={product.image} alt={product.title} className="h-full w-full object-cover" />
         </div>
 
