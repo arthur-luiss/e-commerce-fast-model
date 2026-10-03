@@ -7,17 +7,25 @@ export default function Catalog() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [sort, setSort] = useState('relevance');
   const category = searchParams.get('categoria');
+  const rawSearch = searchParams.get('busca')?.trim() ?? '';
+  const search = rawSearch.toLowerCase();
 
   const visible = useMemo(() => {
-    const list = category ? products.filter((p) => p.category === category) : [...products];
+    const list = products.filter(
+      (p) =>
+        (!category || p.category === category) &&
+        (!search || `${p.title} ${p.brand} ${p.category}`.toLowerCase().includes(search))
+    );
     if (sort === 'price-asc') list.sort((a, b) => a.price - b.price);
     if (sort === 'price-desc') list.sort((a, b) => b.price - a.price);
     return list;
-  }, [category, sort]);
+  }, [category, search, sort]);
 
   const selectCategory = (cat) => {
-    if (cat) setSearchParams({ categoria: cat });
-    else setSearchParams({});
+    const next = new URLSearchParams(searchParams);
+    if (cat) next.set('categoria', cat);
+    else next.delete('categoria');
+    setSearchParams(next);
   };
 
   const chip = (active) =>
@@ -29,7 +37,9 @@ export default function Catalog() {
 
   return (
     <div className="pb-16">
-      <h1 className="mb-6 text-2xl font-black">{category ?? 'Todos os produtos'}</h1>
+      <h1 className="mb-6 text-2xl font-black">
+        {rawSearch ? `Resultados para "${rawSearch}"` : (category ?? 'Todos os produtos')}
+      </h1>
 
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-wrap gap-2">
