@@ -21,7 +21,7 @@ export default function Hero() {
       <div className="absolute inset-x-0 top-[55%] h-24 -rotate-2 bg-white/25 blur-2xl" />
 
       {/* Título */}
-      <div className="relative z-10 flex justify-center pt-150px text-white">
+      <div className="relative z-10 flex justify-center pt-40 text-white">
         <div className="flex items-end gap-3">
           <h1 className="text-[clamp(4rem,14vw,13rem)] font-light leading-none tracking-tight">
             VERÃO
