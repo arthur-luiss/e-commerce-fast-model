@@ -43,17 +43,17 @@ export default function Navbar({ overHero = false }) {
     <header
       className={`${overHero ? "fixed" : "sticky"} inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${headerStyle}`}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-6 md:gap-10">
+      <div className="mx-auto grid h-16 max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-6 md:grid-cols-[1fr_minmax(0,42rem)_1fr] md:gap-10">
         <Link
           to="/"
-          className="shrink-0 rounded-full bg-black px-4 py-1.5 text-xl font-medium lowercase tracking-tight text-white"
+          className="shrink-0 justify-self-start rounded-full bg-black px-4 py-1.5 text-xl font-medium lowercase tracking-tight text-white"
         >
           loja<span className="ml-0.5 text-sm">•</span>
         </Link>
 
         <form
           onSubmit={handleSearch}
-          className="flex max-w-2xl flex-1 items-center rounded-full bg-slate-100 text-slate-800"
+          className="flex w-full items-center rounded-full bg-slate-100 text-slate-800"
         >
           <input
             type="text"
@@ -71,7 +71,7 @@ export default function Navbar({ overHero = false }) {
           </button>
         </form>
 
-        <div className="ml-auto flex items-center gap-5">
+        <div className="flex items-center justify-end gap-5">
           <Link to="/" className="hidden text-sm font-medium md:block">
             Entrar
           </Link>
