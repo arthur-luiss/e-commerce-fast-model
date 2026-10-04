@@ -3,23 +3,34 @@ import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { products, categories } from '../data/products';
 
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
 export default function Catalog() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [sort, setSort] = useState('relevance');
+
   const category = searchParams.get('categoria');
+  const genero = searchParams.get('genero');
+  const tamanho = searchParams.get('tamanho');
+  const promocao = searchParams.get('promocao') === '1';
   const rawSearch = searchParams.get('busca')?.trim() ?? '';
   const search = rawSearch.toLowerCase();
+
+  const hasFilters = Boolean(category || genero || tamanho || promocao || rawSearch);
 
   const visible = useMemo(() => {
     const list = products.filter(
       (p) =>
         (!category || p.category === category) &&
+        (!genero || p.gender === genero || p.gender === 'unissex') &&
+        (!tamanho || p.sizes.includes(tamanho)) &&
+        (!promocao || p.oldPrice) &&
         (!search || `${p.title} ${p.brand} ${p.category}`.toLowerCase().includes(search))
     );
     if (sort === 'price-asc') list.sort((a, b) => a.price - b.price);
     if (sort === 'price-desc') list.sort((a, b) => b.price - a.price);
     return list;
-  }, [category, search, sort]);
+  }, [category, genero, tamanho, promocao, search, sort]);
 
   const selectCategory = (cat) => {
     const next = new URLSearchParams(searchParams);
@@ -35,14 +46,33 @@ export default function Catalog() {
         : 'border-slate-200 text-slate-600 hover:border-slate-900 hover:text-slate-900'
     }`;
 
-  const title = rawSearch ? `Resultados para "${rawSearch}"` : (category ?? 'Todos os produtos');
+  const titleParts = [
+    genero && capitalize(genero),
+    category,
+    tamanho && `Tamanho ${tamanho}`,
+    promocao && 'Em promoção',
+  ].filter(Boolean);
+
+  const title = rawSearch
+    ? `Resultados para "${rawSearch}"`
+    : titleParts.join(' · ') || 'Todos os produtos';
 
   return (
     <div className="pb-20">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-          <p className="mt-1 text-sm text-slate-500">{visible.length} produtos</p>
+          <p className="mt-1 text-sm text-slate-500">
+            {visible.length} produtos
+            {hasFilters && (
+              <button
+                onClick={() => setSearchParams({})}
+                className="ml-3 font-medium text-slate-900 underline underline-offset-2"
+              >
+                Limpar filtros
+              </button>
+            )}
+          </p>
         </div>
 
         <select
