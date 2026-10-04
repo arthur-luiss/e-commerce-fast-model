@@ -12,19 +12,6 @@ export default function Home() {
       <Hero />
       <BenefitsBar />
 
-      {/* Abas Feminino | Masculino */}
-      <nav className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-720px">
-          <Link to="/catalogo" className="flex-1 py-5 text-center text-sm font-bold tracking-wide hover:text-blue-600">
-            FEMININO
-          </Link>
-          <span className="my-4 w-px bg-slate-200" />
-          <Link to="/catalogo" className="flex-1 py-5 text-center text-sm font-bold tracking-wide hover:text-blue-600">
-            MASCULINO
-          </Link>
-        </div>
-      </nav>
-
       <div className="max-w-7xl space-y-12 px-6 py-12">
         <section>
           <h2 className="mb-4 text-xl font-bold">Compre por categoria</h2>
