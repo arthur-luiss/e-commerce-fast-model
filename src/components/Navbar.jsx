@@ -5,7 +5,7 @@ import { menus } from '../data/menu';
 import Icon from './Icon';
 import MegaMenu from './MegaMenu';
 
-const navItems = ['Clube', 'Feminino', 'Masculino', 'Infantil', 'Esportivo', 'Marcas', 'Outlet'];
+const navItems = Object.keys(menus);
 
 export default function Navbar({ overHero = false }) {
   const { totalItems } = useCart();
