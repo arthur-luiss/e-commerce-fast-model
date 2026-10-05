@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 export default function MegaMenu({ menu, onClose }) {
   return (
     <div className="absolute inset-x-0 top-full border-t border-slate-200 bg-white text-slate-900 shadow-xl">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-8 gap-y-10 px-6 py-8 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-8 gap-y-10 px-6 py-8 lg:grid-cols-5">
         {menu.columns.map((col) => (
           <div key={col.title}>
             <h3 className="mb-3 text-sm font-bold uppercase tracking-wide">{col.title}</h3>
