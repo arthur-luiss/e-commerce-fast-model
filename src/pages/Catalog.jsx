@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
-import { products, categories } from '../data/products';
+import { products, categories, matchesGender } from '../data/products';
 
 const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+const kidsLabels = { bebe: 'Bebês', menina: 'Menina', menino: 'Menino' };
 
 export default function Catalog() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -11,26 +12,42 @@ export default function Catalog() {
 
   const category = searchParams.get('categoria');
   const genero = searchParams.get('genero');
+  const publico = searchParams.get('publico');
+  const marca = searchParams.get('marca');
   const tamanho = searchParams.get('tamanho');
+  const esporte = searchParams.get('esporte') === '1';
   const promocao = searchParams.get('promocao') === '1';
   const rawSearch = searchParams.get('busca')?.trim() ?? '';
   const search = rawSearch.toLowerCase();
 
-  const hasFilters = Boolean(category || genero || tamanho || promocao || rawSearch);
+  const hasFilters = Boolean(
+    category || genero || publico || marca || tamanho || esporte || promocao || rawSearch
+  );
+
+  // Todos os filtros, menos a categoria (usada para montar os botões de categoria).
+  const baseList = useMemo(
+    () =>
+      products.filter(
+        (p) =>
+          (!genero || matchesGender(p, genero)) &&
+          (!publico || p.kids === publico) &&
+          (!marca || p.brand === marca) &&
+          (!tamanho || p.sizes.includes(tamanho)) &&
+          (!esporte || p.sport) &&
+          (!promocao || p.oldPrice) &&
+          (!search || `${p.title} ${p.brand} ${p.category}`.toLowerCase().includes(search))
+      ),
+    [genero, publico, marca, tamanho, esporte, promocao, search]
+  );
+
+  const availableCategories = categories.filter((c) => baseList.some((p) => p.category === c));
 
   const visible = useMemo(() => {
-    const list = products.filter(
-      (p) =>
-        (!category || p.category === category) &&
-        (!genero || p.gender === genero || p.gender === 'unissex') &&
-        (!tamanho || p.sizes.includes(tamanho)) &&
-        (!promocao || p.oldPrice) &&
-        (!search || `${p.title} ${p.brand} ${p.category}`.toLowerCase().includes(search))
-    );
+    const list = category ? baseList.filter((p) => p.category === category) : [...baseList];
     if (sort === 'price-asc') list.sort((a, b) => a.price - b.price);
     if (sort === 'price-desc') list.sort((a, b) => b.price - a.price);
     return list;
-  }, [category, genero, tamanho, promocao, search, sort]);
+  }, [baseList, category, sort]);
 
   const selectCategory = (cat) => {
     const next = new URLSearchParams(searchParams);
@@ -48,6 +65,9 @@ export default function Catalog() {
 
   const titleParts = [
     genero && capitalize(genero),
+    esporte && 'Esportivo',
+    publico && kidsLabels[publico],
+    marca,
     category,
     tamanho && `Tamanho ${tamanho}`,
     promocao && 'Em promoção',
@@ -87,14 +107,16 @@ export default function Catalog() {
         </select>
       </div>
 
-      <div className="mb-8 flex gap-2 overflow-x-auto pb-1 scrollbar-width:none">
-        <button onClick={() => selectCategory(null)} className={chip(!category)}>Todos</button>
-        {categories.map((cat) => (
-          <button key={cat} onClick={() => selectCategory(cat)} className={chip(category === cat)}>
-            {cat}
-          </button>
-        ))}
-      </div>
+      {availableCategories.length > 1 && (
+        <div className="mb-8 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+          <button onClick={() => selectCategory(null)} className={chip(!category)}>Todos</button>
+          {availableCategories.map((cat) => (
+            <button key={cat} onClick={() => selectCategory(cat)} className={chip(category === cat)}>
+              {cat}
+            </button>
+          ))}
+        </div>
+      )}
 
       {visible.length === 0 ? (
         <p className="py-20 text-center text-slate-500">Nenhum produto encontrado.</p>
