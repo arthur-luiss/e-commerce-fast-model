@@ -108,7 +108,7 @@ export default function Catalog() {
       </div>
 
       {availableCategories.length > 1 && (
-        <div className="mb-8 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+        <div className="mb-8 flex gap-2 overflow-x-auto pb-1 scrollbar-width:none">
           <button onClick={() => selectCategory(null)} className={chip(!category)}>Todos</button>
           {availableCategories.map((cat) => (
             <button key={cat} onClick={() => selectCategory(cat)} className={chip(category === cat)}>
