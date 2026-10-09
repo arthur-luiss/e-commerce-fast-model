@@ -2,7 +2,7 @@ const img = (seed) => `https://picsum.photos/seed/${seed}/600/800`;
 
 export const categories = ['Camisetas', 'Calças', 'Shorts', 'Vestidos', 'Jaquetas', 'Conjuntos', 'Acessórios'];
 
-export const products = [
+const rawProducts = [
   { id: 1,  title: 'Camiseta Básica Algodão',      brand: 'Urban Basic', category: 'Camisetas',  gender: 'unissex',   price: 59.9,  oldPrice: 89.9,  image: img('camiseta1'),  sizes: ['P', 'M', 'G', 'GG'],    featured: true },
   { id: 2,  title: 'Camiseta Oversized Estampada', brand: 'Street Co.',  category: 'Camisetas',  gender: 'unissex',   price: 79.9,  oldPrice: null,  image: img('camiseta2'),  sizes: ['M', 'G', 'GG'],         featured: false },
   { id: 3,  title: 'Calça Jeans Slim',             brand: 'Denim Lab',   category: 'Calças',     gender: 'unissex',   price: 169.9, oldPrice: 229.9, image: img('calca1'),     sizes: ['38', '40', '42', '44'], featured: true },
@@ -29,6 +29,11 @@ export const products = [
   { id: 20, title: 'Calça Legging Infantil',       brand: 'Mini Club',   category: 'Calças',     gender: 'infantil', kids: 'menina', price: 54.9, oldPrice: 69.9,  image: img('kids5'), sizes: ['1-4', '5-8', '9-12'],  featured: false },
   { id: 21, title: 'Boné Infantil Aba Curva',      brand: 'Mini Club',   category: 'Acessórios', gender: 'infantil', kids: 'menino', price: 39.9, oldPrice: null,  image: img('kids6'), sizes: ['Único'],               featured: false },
 ];
+
+export const products = rawProducts.map((p) => ({
+  ...p,
+  images: [p.image, ...[2, 3, 4].map((n) => p.image.replace('/600/800', `-${n}/600/800`))],
+}));
 
 export const getProductById = (id) => products.find((p) => p.id === Number(id));
 
