@@ -12,7 +12,7 @@ export default function ProductCard({ product }) {
   return (
     <div className="group relative">
       <Link to={`/produto/${id}`} className="block">
-        <div className="relative aspect-[3/4] overflow-hidden bg-slate-100">
+        <div className="relative aspect-3/4 overflow-hidden bg-slate-100">
           <img
             src={image}
             alt={title}
