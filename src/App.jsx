@@ -6,6 +6,8 @@ import Home from './pages/Home';
 import Catalog from './pages/Catalog';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
+import FavoritesProvider from './context/FavoritesProvider';
+import Favorites from './pages/Favorites';
 
 function Layout() {
   const { pathname } = useLocation();
@@ -24,6 +26,7 @@ function Layout() {
           <Route path="/catalogo" element={<Catalog />} />
           <Route path="/produto/:id" element={<ProductDetails />} />
           <Route path="/carrinho" element={<Cart />} />
+          <Route path="/favoritos" element={<Favorites />} />
         </Routes>
       </main>
     </div>
@@ -34,7 +37,9 @@ export default function App() {
   return (
     <Router>
       <CartProvider>
-        <Layout />
+        <FavoritesProvider>
+          <Layout />
+        </FavoritesProvider>
       </CartProvider>
     </Router>
   );
