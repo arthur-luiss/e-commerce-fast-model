@@ -22,7 +22,7 @@ export default function MobileMenu({ open, onClose }) {
   }, [open, onClose]);
 
   return (
-    <div className={`fixed inset-0 z-[60] md:hidden ${open ? '' : 'pointer-events-none'}`}>
+    <div className={`fixed inset-0 z-60 md:hidden ${open ? '' : 'pointer-events-none'}`}>
       {/* Fundo escuro */}
       <div
         onClick={onClose}
