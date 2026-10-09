@@ -11,11 +11,11 @@ const paths = {
   bolt: 'm3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z',
 };
 
-export default function Icon({ name, className = 'h-6 w-6' }) {
+export default function Icon({ name, className = 'h-6 w-6', filled = false }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      fill="none"
+      fill={filled ? 'currentColor' : 'none'}
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
