@@ -6,7 +6,7 @@ import { menus } from '../data/menu';
 import Icon from './Icon';
 import MegaMenu from './MegaMenu';
 import MobileMenu from './MobileMenu';
-import { brand } from '../config/brand';
+import Logo from './Logo';
 
 const navItems = Object.keys(menus);
 
@@ -64,12 +64,7 @@ export default function Navbar({ overHero = false }) {
               <Icon name="menu" className="h-6 w-6" />
             </button>
 
-            <Link
-              to="/"
-              className="shrink-0 rounded-full bg-black px-4 py-1.5 text-xl font-medium lowercase tracking-tight text-white"
-            >
-              {brand.name.toLowerCase()}<span className="ml-0.5 text-sm">•</span>
-            </Link>
+            <Logo className="shrink-0" />
           </div>
 
           <form
