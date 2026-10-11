@@ -1,51 +1,111 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { brand } from '../config/brand';
 
 const tones = {
-  sage: '#8fae9b',
+  sage: '#7f9f8b',
   terracotta: '#c8745a',
   navy: '#2f4057',
-  sand: '#e3cfae',
+  camel: '#b08968',
 };
 
 // Textura de tecido (trama) feita só com CSS
 const weave =
-  'repeating-linear-gradient(0deg, rgba(255,255,255,0.22) 0 5px, transparent 5px 10px), repeating-linear-gradient(90deg, rgba(0,0,0,0.14) 0 5px, transparent 5px 10px)';
+  'repeating-linear-gradient(0deg, rgba(255,255,255,0.12) 0 5px, transparent 5px 10px), repeating-linear-gradient(90deg, rgba(0,0,0,0.09) 0 5px, transparent 5px 10px)';
 
-// Sem `src` mostra a amostra de tecido; com `src` mostra a foto.
-function Polaroid({ tone, src, className = '' }) {
+// Ilustrações simples de peças, usadas enquanto não há fotos reais
+function Piece({ name, tone }) {
+  const props = { className: 'absolute inset-0 m-auto h-3/4 w-3/4', 'aria-hidden': true };
+  const detail = { fill: 'none', stroke: tone, strokeWidth: 1.6, strokeLinecap: 'round' };
+
+  switch (name) {
+    case 'tee':
+      return (
+        <svg viewBox="0 0 64 64" {...props}>
+          <path
+            fill="#fff"
+            d="M22 8 L8 15 L13 27 L21 23 L21 56 L43 56 L43 23 L51 27 L56 15 L42 8 C40 12 36 14 32 14 C28 14 24 12 22 8 Z"
+          />
+          <path {...detail} d="M22 8 C24 12 28 14 32 14 C36 14 40 12 42 8" />
+        </svg>
+      );
+    case 'dress':
+      return (
+        <svg viewBox="0 0 64 64" {...props}>
+          <path fill="#fff" d="M23 6 L27 6 L29 17 L35 17 L37 6 L41 6 L42 22 L51 57 L13 57 L22 22 Z" />
+          <path {...detail} d="M23 28 H41" />
+        </svg>
+      );
+    case 'sunglasses':
+      return (
+        <svg viewBox="0 14 64 40" {...props}>
+          <rect x="6" y="26" width="23" height="18" rx="9" fill="#fff" />
+          <rect x="35" y="26" width="23" height="18" rx="9" fill="#fff" />
+          <path d="M29 31 Q32 27 35 31" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
+          <path d="M6 30 L2 24 M58 30 L62 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+      );
+    case 'cap':
+      return (
+        <svg viewBox="4 4 64 54" {...props}>
+          <path fill="#fff" d="M12 42 C12 24 22 15 33 15 C46 15 54 25 54 42 Z" />
+          <path fill="#fff" d="M38 42 H62 Q60 50 48 50 H38 Z" />
+          <circle cx="33" cy="14" r="2.8" fill="#fff" />
+          <path {...detail} d="M33 16 V42" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
+
+// Mostra a foto de `src`. Se o arquivo não existir, cai na ilustração da peça.
+function Polaroid({ piece, tone, src, className = '' }) {
+  const [failed, setFailed] = useState(false);
+  const showPhoto = src && !failed;
+
   return (
     <div className={`bg-white p-2 pb-7 shadow-xl shadow-black/25 ${className}`}>
-      {src ? (
-        <img src={src} alt="" className="aspect-4/5 w-full object-cover" />
-      ) : (
-        <div
-          className="aspect-4/5 w-full"
-          style={{ backgroundColor: tones[tone], backgroundImage: weave }}
-        />
-      )}
+      <div
+        className="relative aspect-4/5 w-full overflow-hidden"
+        style={{
+          backgroundColor: tones[tone],
+          backgroundImage: showPhoto ? undefined : weave,
+        }}
+      >
+        {showPhoto ? (
+          <img
+            src={src}
+            alt=""
+            onError={() => setFailed(true)}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <Piece name={piece} tone={tones[tone]} />
+        )}
+      </div>
     </div>
   );
 }
 
-function PhotoStack({ side }) {
-  const left = side === 'left';
+// Para usar fotos reais, coloque os arquivos em public/hero/ com estes nomes.
+const stacks = {
+  left: [
+    { piece: 'tee', tone: 'sage', src: '/hero/1.jpg', className: 'left-0 top-4 w-44 -rotate-6' },
+    { piece: 'sunglasses', tone: 'terracotta', src: '/hero/2.jpg', className: 'right-0 top-36 w-36 rotate-6' },
+  ],
+  right: [
+    { piece: 'dress', tone: 'navy', src: '/hero/3.jpg', className: 'right-0 top-4 w-44 rotate-6' },
+    { piece: 'cap', tone: 'camel', src: '/hero/4.jpg', className: 'left-0 top-36 w-36 -rotate-6' },
+  ],
+};
 
+function PhotoStack({ side }) {
   return (
-    <div
-      aria-hidden="true"
-      className={`relative hidden h-400px w-340px xl:block ${
-        left ? 'justify-self-end' : 'justify-self-start'
-      }`}
-    >
-      <Polaroid
-        tone={left ? 'sage' : 'navy'}
-        className={`absolute top-4 w-[62%] ${left ? 'left-0 -rotate-6' : 'right-0 rotate-6'}`}
-      />
-      <Polaroid
-        tone={left ? 'terracotta' : 'sand'}
-        className={`absolute top-36 w-[48%] ${left ? 'right-0 rotate-6' : 'left-0 -rotate-6'}`}
-      />
+    <div aria-hidden="true" className="relative hidden h-96 w-80 justify-self-center xl:block">
+      {stacks[side].map((item) => (
+        <Polaroid key={item.piece} {...item} className={`absolute ${item.className}`} />
+      ))}
     </div>
   );
 }
@@ -82,11 +142,11 @@ export default function Hero() {
             Ver coleção
           </Link>
 
-          {/* Versão compacta das amostras para telas menores */}
+          {/* Versão compacta para telas menores */}
           <div aria-hidden="true" className="mt-12 flex justify-center gap-3 xl:hidden">
-            <Polaroid tone="sage" className="w-24 -rotate-6 sm:w-32" />
-            <Polaroid tone="terracotta" className="mt-4 w-24 rotate-3 sm:w-32" />
-            <Polaroid tone="navy" className="w-24 rotate-6 sm:w-32" />
+            <Polaroid piece="tee" tone="sage" className="w-24 -rotate-6 sm:w-32" />
+            <Polaroid piece="dress" tone="navy" className="mt-4 w-24 rotate-3 sm:w-32" />
+            <Polaroid piece="sunglasses" tone="terracotta" className="w-24 rotate-6 sm:w-32" />
           </div>
         </div>
 
