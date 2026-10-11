@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { brand } from '../config/brand';
 
 function Polaroid({ seed, className = '' }) {
   return (
@@ -28,7 +29,7 @@ export default function Hero() {
           </h1>
           <div className="mb-[1.5vw] flex flex-col items-center">
             <span className="rounded-full bg-white px-[2vw] py-[0.5vw] text-[clamp(1rem,3.5vw,3.5rem)] font-medium lowercase text-teal-600">
-              loja•
+              {brand.name.toLowerCase()}•
             </span>
             <span className="text-[clamp(1rem,2.4vw,2.4rem)] font-light">2027</span>
           </div>

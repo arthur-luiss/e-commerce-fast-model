@@ -1,4 +1,5 @@
 import { products, categories, matchesGender } from './products';
+import { brand } from '../config/brand';
 
 const to = (params) => `/catalogo?${new URLSearchParams(params)}`;
 
@@ -89,7 +90,7 @@ const brandsMenu = () => ({
   to: '/catalogo',
   columns: [
     {
-      title: 'Exclusivas na Loja',
+      title: `Exclusivas na ${brand.name}`,
       links: exclusiveBrands.map((b) => ({ label: b, to: to({ marca: b }) })),
     },
     {

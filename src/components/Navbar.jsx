@@ -6,6 +6,7 @@ import { menus } from '../data/menu';
 import Icon from './Icon';
 import MegaMenu from './MegaMenu';
 import MobileMenu from './MobileMenu';
+import { brand } from '../config/brand';
 
 const navItems = Object.keys(menus);
 
@@ -67,7 +68,7 @@ export default function Navbar({ overHero = false }) {
               to="/"
               className="shrink-0 rounded-full bg-black px-4 py-1.5 text-xl font-medium lowercase tracking-tight text-white"
             >
-              loja<span className="ml-0.5 text-sm">•</span>
+              {brand.name.toLowerCase()}<span className="ml-0.5 text-sm">•</span>
             </Link>
           </div>
 

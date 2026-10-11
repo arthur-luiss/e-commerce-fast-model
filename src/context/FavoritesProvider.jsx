@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FavoritesContext } from './favorites-context';
+import { brand } from '../config/brand';
 
-const STORAGE_KEY = 'loja:favorites';
+const STORAGE_KEY = `${brand.slug}:favorites`;
 
 function loadInitialState() {
   try {

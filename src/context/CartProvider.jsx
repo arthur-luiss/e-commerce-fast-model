@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useReducer } from 'react';
 import { CartContext } from './cart-context';
+import { brand } from '../config/brand';
 
-const STORAGE_KEY = 'loja:cart';
+const STORAGE_KEY = `${brand.slug}:cart`;
 const MAX_QTY = 10;
 
 const clamp = (n) => Math.max(1, Math.min(MAX_QTY, n));
