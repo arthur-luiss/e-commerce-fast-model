@@ -113,7 +113,7 @@ As imagens são placeholders do [Picsum](https://picsum.photos/). Para usar foto
 
 ## Trocar o nome da loja
 
-O nome fica em `src/config/brand.js`. Altere `name` e `slug` e atualize o título em `index.html` e o `public/favicon-trama.svg`.
+O nome fica em `src/config/brand.js`. Altere `name` e `slug`, atualize o título em `index.html` e o ícone em `public/favicon-botao.svg`. A logo é o componente `src/components/Logo.jsx`.
 
 ## Deploy
 
