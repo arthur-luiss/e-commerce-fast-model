@@ -53,6 +53,8 @@ O projeto abre em `http://localhost:5173`.
 | `/produto/:id`  | Detalhes do produto     |
 | `/carrinho`     | Carrinho de compras     |
 | `/favoritos`    | Lista de favoritos      |
+| `/checkout`     | Finalização da compra   |
+| `/pedido/:id`   | Confirmação do pedido   |
 
 ## Filtros do catálogo
 
