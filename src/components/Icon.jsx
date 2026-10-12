@@ -16,6 +16,7 @@ const paths = {
   menu: "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5",
   close: "M6 18 18 6M6 6l12 12",
   chevron: "m19.5 8.25-7.5 7.5-7.5-7.5",
+  check: "m4.5 12.75 6 6 9-13.5",
 };
 
 export default function Icon({ name, className = "h-6 w-6", filled = false }) {
