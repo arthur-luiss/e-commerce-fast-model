@@ -16,6 +16,7 @@ Front-end de um e-commerce de moda feminina, masculina e infantil, inspirado na 
 - **Página de produto** com galeria de fotos, seleção de tamanho, detalhes e produtos relacionados
 - **Carrinho** com quantidade, frete grátis acima de R$ 199 e resumo do pedido, salvo no navegador
 - **Favoritos** com contador no cabeçalho, salvos no navegador
+- **Checkout** com validação de CPF e cartão, busca de endereço por CEP e pagamento simulado (Pix, cartão e boleto)
 
 ## Tecnologias
 
@@ -123,7 +124,7 @@ O projeto está publicado na [Vercel](https://vercel.com/). Como é uma aplicaç
 
 ## Próximos passos
 
-- [ ] Checkout (dados, endereço e pagamento simulados)
+- [X] Checkout (dados, endereço e pagamento simulados)
 - [ ] Avaliações de produtos
 - [ ] Tabela de medidas e cálculo de frete por CEP
 - [ ] Fotos e descrições reais dos produtos
