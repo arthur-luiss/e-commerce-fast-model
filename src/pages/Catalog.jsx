@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { products, categories, matchesGender } from '../data/products';
+import { useReviews } from '../hooks/useReviews';
 
 const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const kidsLabels = { bebe: 'Bebês', menina: 'Menina', menino: 'Menino' };
@@ -19,6 +20,7 @@ export default function Catalog() {
   const promocao = searchParams.get('promocao') === '1';
   const rawSearch = searchParams.get('busca')?.trim() ?? '';
   const search = rawSearch.toLowerCase();
+  const { getSummary } = useReviews();
 
   const hasFilters = Boolean(
     category || genero || publico || marca || tamanho || esporte || promocao || rawSearch
@@ -46,8 +48,9 @@ export default function Catalog() {
     const list = category ? baseList.filter((p) => p.category === category) : [...baseList];
     if (sort === 'price-asc') list.sort((a, b) => a.price - b.price);
     if (sort === 'price-desc') list.sort((a, b) => b.price - a.price);
+    if (sort === 'rating') list.sort((a, b) => getSummary(b.id).average - getSummary(a.id).average);
     return list;
-  }, [baseList, category, sort]);
+  }, [baseList, category, sort, getSummary]);
 
   const selectCategory = (cat) => {
     const next = new URLSearchParams(searchParams);
@@ -101,6 +104,7 @@ export default function Catalog() {
           aria-label="Ordenar produtos"
           className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 outline-none hover:border-slate-900"
         >
+          <option value="rating">Melhor avaliados</option>
           <option value="relevance">Relevância</option>
           <option value="price-asc">Menor preço</option>
           <option value="price-desc">Maior preço</option>
