@@ -17,6 +17,8 @@ const paths = {
   close: "M6 18 18 6M6 6l12 12",
   chevron: "m19.5 8.25-7.5 7.5-7.5-7.5",
   check: "m4.5 12.75 6 6 9-13.5",
+  orders:
+    "M6 3.75h12A1.5 1.5 0 0 1 19.5 5.25v13.5A1.5 1.5 0 0 1 18 20.25H6a1.5 1.5 0 0 1-1.5-1.5V5.25A1.5 1.5 0 0 1 6 3.75ZM8.25 9h7.5M8.25 12.75h7.5M8.25 16.5h4.5",
 };
 
 export default function Icon({ name, className = "h-6 w-6", filled = false }) {
