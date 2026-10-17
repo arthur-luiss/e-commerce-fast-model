@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { menus } from '../data/menu';
-import Icon from './Icon';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { menus } from "../data/menu";
+import Icon from "./Icon";
 
 export default function MobileMenu({ open, onClose }) {
   const [openSection, setOpenSection] = useState(null);
@@ -9,25 +9,27 @@ export default function MobileMenu({ open, onClose }) {
   useEffect(() => {
     if (!open) return;
 
-    const onKey = (e) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
+    const onKey = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
 
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
 
     return () => {
-      window.removeEventListener('keydown', onKey);
+      window.removeEventListener("keydown", onKey);
       document.body.style.overflow = previousOverflow;
     };
   }, [open, onClose]);
 
   return (
-    <div className={`fixed inset-0 z-60 md:hidden ${open ? '' : 'pointer-events-none'}`}>
+    <div
+      className={`fixed inset-0 z-60 md:hidden ${open ? "" : "pointer-events-none"}`}
+    >
       {/* Fundo escuro */}
       <div
         onClick={onClose}
         className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
-          open ? 'opacity-100' : 'opacity-0'
+          open ? "opacity-100" : "opacity-0"
         }`}
       />
 
@@ -35,11 +37,13 @@ export default function MobileMenu({ open, onClose }) {
       <aside
         aria-hidden={!open}
         className={`absolute inset-y-0 left-0 flex w-[85%] max-w-sm flex-col bg-white text-slate-900 shadow-xl transition-transform duration-300 ${
-          open ? 'translate-x-0' : '-translate-x-full'
+          open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 px-6">
-          <span className="text-sm font-bold uppercase tracking-wide">Menu</span>
+          <span className="text-sm font-bold uppercase tracking-wide">
+            Menu
+          </span>
           <button onClick={onClose} aria-label="Fechar menu" className="p-1">
             <Icon name="close" className="h-6 w-6" />
           </button>
@@ -59,7 +63,7 @@ export default function MobileMenu({ open, onClose }) {
                   {name}
                   <Icon
                     name="chevron"
-                    className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                    className={`h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
                   />
                 </button>
 
@@ -82,7 +86,11 @@ export default function MobileMenu({ open, onClose }) {
                         <ul className="space-y-2.5">
                           {col.links.map((link) => (
                             <li key={link.label}>
-                              <Link to={link.to} onClick={onClose} className="text-sm text-slate-700">
+                              <Link
+                                to={link.to}
+                                onClick={onClose}
+                                className="text-sm text-slate-700"
+                              >
                                 {link.label}
                               </Link>
                             </li>
@@ -116,6 +124,14 @@ export default function MobileMenu({ open, onClose }) {
             );
           })}
         </nav>
+        <div className="shrink-0 space-y-3 border-t border-slate-200 px-6 py-4 text-sm font-medium">
+          <Link to="/pedidos" onClick={onClose} className="block">
+            Meus pedidos
+          </Link>
+          <Link to="/favoritos" onClick={onClose} className="block">
+            Favoritos
+          </Link>
+        </div>
       </aside>
     </div>
   );
