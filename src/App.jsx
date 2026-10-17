@@ -15,6 +15,7 @@ import FavoritesProvider from "./context/FavoritesProvider";
 import Favorites from "./pages/Favorites";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import Orders from './pages/Orders';
 
 function Layout() {
   const { pathname } = useLocation();
@@ -36,6 +37,7 @@ function Layout() {
           <Route path="/favoritos" element={<Favorites />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/pedido/:id" element={<OrderConfirmation />} />
+          <Route path="/pedidos" element={<Orders />} />
         </Routes>
       </main>
     </div>
