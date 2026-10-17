@@ -31,3 +31,14 @@ export function createPaymentCode(method, id) {
   if (method === 'boleto') return `00000.00000 00000.000000 00000.000000 0 ${id.padEnd(14, '0')}`;
   return null;
 }
+
+export const getOrders = readOrders;
+
+export function updateOrder(id, patch) {
+  try {
+    const next = readOrders().map((o) => (o.id === id ? { ...o, ...patch } : o));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    // armazenamento indisponível: a alteração não será guardada
+  }
+}
