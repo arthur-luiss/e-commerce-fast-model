@@ -1,31 +1,33 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Icon from '../components/Icon';
+import OrderTimeline from '../components/OrderTimeline';
+import { useNow } from '../hooks/useNow';
 import { formatBRL } from '../utils/format';
-import { getOrder } from '../utils/orders';
+import { getOrder, updateOrder } from '../utils/orders';
+import { getPaidAt, STEP_MS } from '../utils/tracking';
 
 const DAY = 24 * 60 * 60 * 1000;
 
-export default function OrderConfirmation() {
-  const { id } = useParams();
-  const order = useMemo(() => getOrder(id), [id]);
+function OrderView({ id }) {
+  const [order, setOrder] = useState(() => getOrder(id));
   const [copied, setCopied] = useState(false);
+  const now = useNow();
 
   if (!order) {
     return (
       <div className="py-20 text-center">
         <h1 className="text-2xl font-bold tracking-tight">Pedido não encontrado</h1>
-        <p className="mt-2 text-slate-500">
-          Os pedidos ficam salvos apenas neste navegador.
-        </p>
-        <Link to="/catalogo" className="mt-6 inline-block font-semibold underline">
-          Voltar ao catálogo
+        <p className="mt-2 text-slate-500">Os pedidos ficam salvos apenas neste navegador.</p>
+        <Link to="/pedidos" className="mt-6 inline-block font-semibold underline">
+          Ver meus pedidos
         </Link>
       </div>
     );
   }
 
   const { payment, address, customer } = order;
+  const paid = Boolean(getPaidAt(order));
   const firstName = customer.name.split(' ')[0];
   const dueDate = new Date(order.createdAt + 3 * DAY).toLocaleDateString('pt-BR');
 
@@ -39,9 +41,18 @@ export default function OrderConfirmation() {
     }
   };
 
+  const simulatePayment = () => {
+    updateOrder(order.id, { paidAt: Date.now() });
+    setOrder(getOrder(order.id));
+  };
+
   return (
     <div className="mx-auto max-w-3xl pb-20">
-      <div className="text-center">
+      <Link to="/pedidos" className="text-sm text-slate-500 hover:text-slate-900">
+        ← Meus pedidos
+      </Link>
+
+      <div className="mt-6 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-600">
           <Icon name="check" className="h-7 w-7" />
         </div>
@@ -63,7 +74,14 @@ export default function OrderConfirmation() {
           </p>
         )}
 
-        {payment.method !== 'card' && (
+        {payment.method !== 'card' && paid && (
+          <p className="text-sm text-slate-600">
+            <span className="font-semibold text-green-600">Pagamento confirmado.</span> Seu pedido já
+            está sendo preparado.
+          </p>
+        )}
+
+        {payment.method !== 'card' && !paid && (
           <>
             <p className="text-sm text-slate-600">
               <span className="font-semibold text-amber-600">Aguardando pagamento.</span>{' '}
@@ -83,8 +101,25 @@ export default function OrderConfirmation() {
             <p className="mt-3 text-xs text-slate-400">
               Código de demonstração: não funciona em aplicativos de banco.
             </p>
+            <button
+              onClick={simulatePayment}
+              className="mt-4 rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white hover:bg-slate-700"
+            >
+              Simular pagamento
+            </button>
+            <p className="mt-2 text-xs text-slate-400">
+              Só para demonstração: confirma o pagamento e inicia o acompanhamento.
+            </p>
           </>
         )}
+      </section>
+
+      <section className="mt-6 rounded-xl border border-slate-200 p-6">
+        <h2 className="mb-5 text-base font-bold">Acompanhamento</h2>
+        <OrderTimeline order={order} now={now} />
+        <p className="mt-5 text-xs text-slate-400">
+          Simulação: cada etapa avança a cada {STEP_MS / 60000} minuto.
+        </p>
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200 p-6">
@@ -97,7 +132,6 @@ export default function OrderConfirmation() {
           <br />
           CEP {address.cep}
         </address>
-        <p className="mt-3 text-sm text-slate-500">Entrega estimada em 5 a 8 dias úteis.</p>
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200 p-6">
@@ -149,4 +183,9 @@ export default function OrderConfirmation() {
       </div>
     </div>
   );
+}
+
+export default function OrderConfirmation() {
+  const { id } = useParams();
+  return <OrderView key={id} id={id} />;
 }
