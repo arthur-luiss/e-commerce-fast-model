@@ -42,3 +42,6 @@ export function updateOrder(id, patch) {
     // armazenamento indisponível: a alteração não será guardada
   }
 }
+
+export const hasPurchased = (productId) =>
+  readOrders().some((o) => o.items.some((i) => i.id === productId));
