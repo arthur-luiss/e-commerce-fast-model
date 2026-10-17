@@ -16,6 +16,7 @@ import Favorites from "./pages/Favorites";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import Orders from './pages/Orders';
+import ReviewsProvider from './context/ReviewsProvider';
 
 function Layout() {
   const { pathname } = useLocation();
@@ -49,7 +50,9 @@ export default function App() {
     <Router>
       <CartProvider>
         <FavoritesProvider>
-          <Layout />
+          <ReviewsProvider>
+            <Layout />
+          </ReviewsProvider>
         </FavoritesProvider>
       </CartProvider>
     </Router>
