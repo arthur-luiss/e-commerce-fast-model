@@ -1,21 +1,34 @@
-import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import Icon from '../components/Icon';
-import ProductCard from '../components/ProductCard';
-import { getProductById } from '../data/products';
-import { formatBRL, getDiscount } from '../utils/format';
-import { genderLabels, getDescription, getRelatedProducts } from '../utils/product';
-import { useCart } from '../hooks/useCart';
-import { useFavorites } from '../hooks/useFavorites';
+import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import Icon from "../components/Icon";
+import ProductCard from "../components/ProductCard";
+import { getProductById } from "../data/products";
+import { formatBRL, getDiscount } from "../utils/format";
+import {
+  genderLabels,
+  getDescription,
+  getRelatedProducts,
+} from "../utils/product";
+import { useCart } from "../hooks/useCart";
+import { useFavorites } from "../hooks/useFavorites";
+import ProductReviews from "../components/ProductReviews";
+import StarRating from "../components/StarRating";
+import { useReviews } from "../hooks/useReviews";
+import { formatRating } from "../utils/reviews";
 
 function Section({ title, defaultOpen = false, children }) {
   return (
     <details open={defaultOpen} className="group border-b border-slate-200">
       <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-sm font-semibold uppercase tracking-wide [&::-webkit-details-marker]:hidden">
         {title}
-        <Icon name="chevron" className="h-4 w-4 transition-transform group-open:rotate-180" />
+        <Icon
+          name="chevron"
+          className="h-4 w-4 transition-transform group-open:rotate-180"
+        />
       </summary>
-      <div className="pb-5 text-sm leading-relaxed text-slate-600">{children}</div>
+      <div className="pb-5 text-sm leading-relaxed text-slate-600">
+        {children}
+      </div>
     </details>
   );
 }
@@ -27,10 +40,12 @@ function ProductView({ product }) {
   const [size, setSize] = useState(null);
   const [added, setAdded] = useState(false);
   const [showError, setShowError] = useState(false);
+  const { getSummary } = useReviews();
 
   const discount = getDiscount(product.price, product.oldPrice);
   const favorite = isFavorite(product.id);
   const related = getRelatedProducts(product);
+  const summary = getSummary(product.id);
 
   const handleAdd = () => {
     if (!size) {
@@ -50,7 +65,9 @@ function ProductView({ product }) {
   return (
     <div className="pb-20">
       <nav aria-label="Você está em" className="mb-6 text-xs text-slate-500">
-        <Link to="/" className="hover:text-slate-900">Início</Link>
+        <Link to="/" className="hover:text-slate-900">
+          Início
+        </Link>
         <span className="mx-2">/</span>
         <Link
           to={`/catalogo?categoria=${encodeURIComponent(product.category)}`}
@@ -81,7 +98,9 @@ function ProductView({ product }) {
                 aria-label={`Ver foto ${i + 1}`}
                 aria-current={i === activeImage}
                 className={`aspect-3/4 overflow-hidden bg-slate-100 ring-offset-2 transition ${
-                  i === activeImage ? 'ring-2 ring-slate-900' : 'opacity-70 hover:opacity-100'
+                  i === activeImage
+                    ? "ring-2 ring-slate-900"
+                    : "opacity-70 hover:opacity-100"
                 }`}
               >
                 <img src={src} alt="" className="h-full w-full object-cover" />
@@ -92,14 +111,33 @@ function ProductView({ product }) {
 
         {/* Informações */}
         <div className="md:sticky md:top-32 md:self-start">
-          <p className="text-xs uppercase tracking-wider text-slate-400">{product.brand}</p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">{product.title}</h1>
+          <p className="text-xs uppercase tracking-wider text-slate-400">
+            {product.brand}
+          </p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight">
+            {product.title}
+          </h1>
+          {summary.count > 0 && (
+            <a
+              href="#avaliacoes"
+              className="mt-2 inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900"
+            >
+              <StarRating value={summary.average} />
+              <span>
+                {formatRating(summary.average)} · {summary.count} avaliações
+              </span>
+            </a>
+          )}
 
           <div className="mt-5">
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-bold">{formatBRL(product.price)}</span>
+              <span className="text-3xl font-bold">
+                {formatBRL(product.price)}
+              </span>
               {product.oldPrice && (
-                <span className="text-slate-400 line-through">{formatBRL(product.oldPrice)}</span>
+                <span className="text-slate-400 line-through">
+                  {formatBRL(product.oldPrice)}
+                </span>
               )}
               {discount > 0 && (
                 <span className="rounded bg-slate-900 px-2 py-0.5 text-xs font-semibold text-white">
@@ -122,8 +160,8 @@ function ProductView({ product }) {
                   aria-pressed={size === s}
                   className={`min-w-14 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
                     size === s
-                      ? 'border-slate-900 bg-slate-900 text-white'
-                      : 'border-slate-300 bg-white text-slate-700 hover:border-slate-900'
+                      ? "border-slate-900 bg-slate-900 text-white"
+                      : "border-slate-300 bg-white text-slate-700 hover:border-slate-900"
                   }`}
                 >
                   {s}
@@ -146,12 +184,14 @@ function ProductView({ product }) {
             </button>
             <button
               onClick={() => toggleFavorite(product.id)}
-              aria-label={favorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+              aria-label={
+                favorite ? "Remover dos favoritos" : "Adicionar aos favoritos"
+              }
               aria-pressed={favorite}
               className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full border transition-colors ${
                 favorite
-                  ? 'border-red-200 bg-red-50 text-red-500'
-                  : 'border-slate-300 text-slate-700 hover:border-slate-900'
+                  ? "border-red-200 bg-red-50 text-red-500"
+                  : "border-slate-300 text-slate-700 hover:border-slate-900"
               }`}
             >
               <Icon name="heart" className="h-5 w-5" filled={favorite} />
@@ -159,9 +199,14 @@ function ProductView({ product }) {
           </div>
 
           {added && (
-            <p role="status" className="mt-3 text-sm font-medium text-green-600">
-              Produto adicionado!{' '}
-              <Link to="/carrinho" className="underline">Ver carrinho</Link>
+            <p
+              role="status"
+              className="mt-3 text-sm font-medium text-green-600"
+            >
+              Produto adicionado!{" "}
+              <Link to="/carrinho" className="underline">
+                Ver carrinho
+              </Link>
             </p>
           )}
 
@@ -179,7 +224,7 @@ function ProductView({ product }) {
                 <dt className="text-slate-400">Público</dt>
                 <dd>{genderLabels[product.gender]}</dd>
                 <dt className="text-slate-400">Código</dt>
-                <dd>{String(product.id).padStart(5, '0')}</dd>
+                <dd>{String(product.id).padStart(5, "0")}</dd>
               </dl>
             </Section>
 
@@ -195,9 +240,12 @@ function ProductView({ product }) {
       </div>
 
       {/* Relacionados */}
+      <ProductReviews product={product} />
       {related.length > 0 && (
         <section className="mt-20">
-          <h2 className="mb-6 text-xl font-bold tracking-tight">Você também pode gostar</h2>
+          <h2 className="mb-6 text-xl font-bold tracking-tight">
+            Você também pode gostar
+          </h2>
           <div className="grid grid-cols-2 gap-x-3 gap-y-10 md:grid-cols-4">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
@@ -217,7 +265,10 @@ export default function ProductDetails() {
     return (
       <div className="py-20 text-center">
         <p className="text-slate-500">Produto não encontrado.</p>
-        <Link to="/catalogo" className="mt-4 inline-block font-semibold text-slate-900 underline">
+        <Link
+          to="/catalogo"
+          className="mt-4 inline-block font-semibold text-slate-900 underline"
+        >
           Voltar ao catálogo
         </Link>
       </div>
