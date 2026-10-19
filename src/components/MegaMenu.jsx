@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 export default function MegaMenu({ menu, onClose }) {
   return (
@@ -6,7 +6,9 @@ export default function MegaMenu({ menu, onClose }) {
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-8 gap-y-10 px-6 py-8 lg:grid-cols-5">
         {menu.columns.map((col) => (
           <div key={col.title}>
-            <h3 className="mb-3 text-sm font-bold uppercase tracking-wide">{col.title}</h3>
+            <h3 className="mb-3 text-sm font-bold uppercase tracking-wide">
+              {col.title}
+            </h3>
 
             <ul className="space-y-2.5">
               {col.links.map((link) => (
@@ -22,7 +24,7 @@ export default function MegaMenu({ menu, onClose }) {
               ))}
             </ul>
 
-            {col.sizes && (
+            {/* {col.sizes && (
               <div className="mt-6">
                 <h3 className="mb-3 text-sm font-bold uppercase tracking-wide">Tamanhos</h3>
                 <div className="grid w-32 grid-cols-2 gap-2">
@@ -38,10 +40,14 @@ export default function MegaMenu({ menu, onClose }) {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
 
             {col.seeAll && (
-              <Link to={col.seeAll} onClick={onClose} className="mt-5 inline-block text-sm font-bold hover:underline">
+              <Link
+                to={col.seeAll}
+                onClick={onClose}
+                className="mt-5 inline-block text-sm font-bold hover:underline"
+              >
                 Ver tudo
               </Link>
             )}

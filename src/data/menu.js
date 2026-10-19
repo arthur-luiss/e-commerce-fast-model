@@ -30,11 +30,13 @@ const accessoriesColumn = (base, items) => ({
 const brandsColumn = (base, filter) => ({
   title: 'Marcas',
   links: brandsOf(filter).map((b) => ({ label: b, to: to({ ...base, marca: b }) })),
+  seeAll: to(base),
 });
 
 const highlightsColumn = (base) => ({
   title: 'Destaques',
   links: [{ label: 'Em promoção', to: to({ ...base, promocao: '1' }) }],
+  seeAll: to({ ...base, promocao: '1' }),
 });
 
 const adultMenu = (genero, accessories) => {
@@ -64,6 +66,7 @@ const kidsMenu = () => {
           { label: 'Menina', to: to({ ...base, publico: 'menina' }) },
           { label: 'Menino', to: to({ ...base, publico: 'menino' }) },
         ],
+        seeAll: to(base),
       },
       clothesColumn({ base, filter, sizes: kidsSizes }),
       accessoriesColumn(base, [{ label: 'Bonés', term: 'Boné' }]),
@@ -92,6 +95,7 @@ const brandsMenu = () => ({
     {
       title: `Exclusivas na ${brand.name}`,
       links: exclusiveBrands.map((b) => ({ label: b, to: to({ marca: b }) })),
+      seeAll: '/catalogo',
     },
     {
       title: 'Marcas parceiras',

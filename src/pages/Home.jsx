@@ -1,8 +1,8 @@
-import { Link } from 'react-router-dom';
-import Hero from '../components/Hero';
-import BenefitsBar from '../components/BenefitsBar';
-import ProductCard from '../components/ProductCard';
-import { products, categories } from '../data/products';
+import { Link } from "react-router-dom";
+import Hero from "../components/Hero";
+import BenefitsBar from "../components/BenefitsBar";
+import ProductCard from "../components/ProductCard";
+import { products, categories } from "../data/products";
 
 export default function Home() {
   const featured = products.filter((p) => p.featured);
@@ -12,7 +12,7 @@ export default function Home() {
       <Hero />
       <BenefitsBar />
 
-      <div className="max-w-7xl space-y-12 px-6 py-12">
+      <div className="mx-auto max-w-7xl space-y-12 px-6 py-12">
         <section>
           <h2 className="mb-4 text-xl font-bold">Compre por categoria</h2>
           <div className="flex flex-wrap gap-3">
@@ -31,7 +31,10 @@ export default function Home() {
         <section>
           <div className="mb-6 flex items-end justify-between">
             <h2 className="text-xl font-bold">Destaques da coleção</h2>
-            <Link to="/catalogo" className="text-sm font-semibold text-blue-600 hover:underline">
+            <Link
+              to="/catalogo"
+              className="text-sm font-semibold text-blue-600 hover:underline"
+            >
               Ver tudo →
             </Link>
           </div>
