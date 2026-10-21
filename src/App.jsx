@@ -21,6 +21,8 @@ import Footer from "./components/Footer";
 import NotFound from "./pages/NotFound";
 import InfoPage from "./pages/InfoPage";
 import Contact from "./pages/Contact";
+import ConsentProvider from "./context/ConsentProvider";
+import CookieBanner from "./components/CookieBanner";
 
 function Layout() {
   const { pathname } = useLocation();
@@ -51,6 +53,7 @@ function Layout() {
         </Routes>
       </main>
       <Footer />
+      <CookieBanner />
     </div>
   );
 }
@@ -61,7 +64,9 @@ export default function App() {
       <CartProvider>
         <FavoritesProvider>
           <ReviewsProvider>
-            <Layout />
+            <ConsentProvider>
+              <Layout />
+            </ConsentProvider>
           </ReviewsProvider>
         </FavoritesProvider>
       </CartProvider>

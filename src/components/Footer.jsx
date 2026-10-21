@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { brand } from '../config/brand';
-import Logo from './Logo';
 import { siteLinkGroups } from '../data/pages';
+import { useConsent } from '../hooks/useConsent';
+import Logo from './Logo';
 
 const { company } = brand;
 const YEAR = new Date().getFullYear();
@@ -31,6 +32,8 @@ const columns = [
 const payments = ['Pix', 'Cartão de crédito', 'Boleto'];
 
 export default function Footer() {
+  const { openPreferences } = useConsent(); // o hook fica aqui dentro do componente
+
   return (
     <footer className="mt-20 border-t border-slate-200 bg-slate-50 text-sm text-slate-600">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 sm:grid-cols-2 lg:grid-cols-6">
@@ -73,7 +76,16 @@ export default function Footer() {
           <p>
             © {YEAR} {company.legalName} · CNPJ {company.cnpj} · {company.address}
           </p>
-          <p>Loja fictícia criada para demonstração.</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <button
+              type="button"
+              onClick={openPreferences}
+              className="font-medium text-slate-700 underline hover:text-slate-900"
+            >
+              Preferências de cookies
+            </button>
+            <span>Loja fictícia criada para demonstração.</span>
+          </div>
         </div>
       </div>
     </footer>
