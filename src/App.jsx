@@ -17,19 +17,20 @@ import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import Orders from './pages/Orders';
 import ReviewsProvider from './context/ReviewsProvider';
+import Footer from './components/Footer';
 
 function Layout() {
   const { pathname } = useLocation();
-  const isHome = pathname === "/";
+  const isHome = pathname === '/';
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-slate-200">
+    <div className="flex min-h-screen flex-col bg-white font-sans text-slate-900 selection:bg-slate-200">
       <Navbar overHero={isHome} />
-      <main className={isHome ? "" : "mx-auto max-w-7xl px-6 pt-8"}>
+      <main className={`flex-1 ${isHome ? '' : 'mx-auto w-full max-w-7xl px-6 pt-8'}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/catalogo" element={<Catalog />} />
@@ -41,6 +42,7 @@ function Layout() {
           <Route path="/pedidos" element={<Orders />} />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }
