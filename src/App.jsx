@@ -18,6 +18,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import Orders from './pages/Orders';
 import ReviewsProvider from './context/ReviewsProvider';
 import Footer from './components/Footer';
+import NotFound from './pages/NotFound';
 
 function Layout() {
   const { pathname } = useLocation();
@@ -40,6 +41,7 @@ function Layout() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/pedido/:id" element={<OrderConfirmation />} />
           <Route path="/pedidos" element={<Orders />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />
