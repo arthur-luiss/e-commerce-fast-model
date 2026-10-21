@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { brand } from '../config/brand';
 import Logo from './Logo';
+import { siteLinkGroups } from '../data/pages';
 
 const { company } = brand;
 const YEAR = new Date().getFullYear();
@@ -24,6 +25,7 @@ const columns = [
       { label: 'Carrinho', to: '/carrinho' },
     ],
   },
+  ...siteLinkGroups,
 ];
 
 const payments = ['Pix', 'Cartão de crédito', 'Boleto'];
