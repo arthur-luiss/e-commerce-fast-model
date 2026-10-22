@@ -16,6 +16,7 @@ import Favorites from "./pages/Favorites";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import Orders from './pages/Orders';
+import Login from "./pages/Login";
 import ReviewsProvider from './context/ReviewsProvider';
 
 function Layout() {
@@ -39,6 +40,7 @@ function Layout() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/pedido/:id" element={<OrderConfirmation />} />
           <Route path="/pedidos" element={<Orders />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </main>
     </div>

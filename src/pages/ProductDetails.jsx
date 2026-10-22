@@ -16,6 +16,24 @@ import StarRating from "../components/StarRating";
 import { useReviews } from "../hooks/useReviews";
 import { formatRating } from "../utils/reviews";
 
+const getGalleryImages = (product) => {
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    return product.images;
+  }
+
+  if (!product.image) return [];
+
+  const crops = ["top", "bottom", "faces"];
+  return [
+    product.image,
+    ...crops.map((crop) => {
+      const url = new URL(product.image);
+      url.searchParams.set("crop", crop);
+      return url.toString();
+    }),
+  ];
+};
+
 function Section({ title, defaultOpen = false, children }) {
   return (
     <details open={defaultOpen} className="group border-b border-slate-200">
@@ -46,6 +64,7 @@ function ProductView({ product }) {
   const favorite = isFavorite(product.id);
   const related = getRelatedProducts(product);
   const summary = getSummary(product.id);
+  const galleryImages = getGalleryImages(product);
 
   const handleAdd = () => {
     if (!size) {
@@ -84,16 +103,17 @@ function ProductView({ product }) {
         <div>
           <div className="aspect-3/4 overflow-hidden bg-slate-100">
             <img
-              src={product.images[activeImage]}
+              src={galleryImages[activeImage]}
               alt={`${product.title} - foto ${activeImage + 1}`}
               className="h-full w-full object-cover"
             />
           </div>
 
           <div className="mt-3 grid grid-cols-4 gap-3">
-            {product.images.map((src, i) => (
+            {galleryImages.map((src, i) => (
               <button
                 key={src}
+                type="button"
                 onClick={() => setActiveImage(i)}
                 aria-label={`Ver foto ${i + 1}`}
                 aria-current={i === activeImage}
@@ -103,7 +123,11 @@ function ProductView({ product }) {
                     : "opacity-70 hover:opacity-100"
                 }`}
               >
-                <img src={src} alt="" className="h-full w-full object-cover" />
+                <img
+                  src={src}
+                  alt={`${product.title} - miniatura ${i + 1}`}
+                  className="h-full w-full object-cover"
+                />
               </button>
             ))}
           </div>

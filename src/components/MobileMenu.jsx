@@ -125,6 +125,9 @@ export default function MobileMenu({ open, onClose }) {
           })}
         </nav>
         <div className="shrink-0 space-y-3 border-t border-slate-200 px-6 py-4 text-sm font-medium">
+          <Link to="/login" onClick={onClose} className="block">
+            Entrar
+          </Link>
           <Link to="/pedidos" onClick={onClose} className="block">
             Meus pedidos
           </Link>

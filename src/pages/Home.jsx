@@ -14,13 +14,13 @@ export default function Home() {
 
       <div className="mx-auto max-w-7xl space-y-12 px-6 py-12">
         <section>
-          <h2 className="mb-4 text-xl font-bold">Compre por categoria</h2>
-          <div className="flex flex-wrap gap-3">
+          <h2 className="mb-4 text-left text-xl font-bold">Compre por categoria</h2>
+          <div className="flex flex-wrap justify-start gap-3">
             {categories.map((cat) => (
               <Link
                 key={cat}
                 to={`/catalogo?categoria=${encodeURIComponent(cat)}`}
-                className="rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-blue-600 hover:text-blue-600"
+                className="cursor-pointer rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-900 hover:text-white hover:cursor-pointer"
               >
                 {cat}
               </Link>
