@@ -15,9 +15,15 @@ import FavoritesProvider from "./context/FavoritesProvider";
 import Favorites from "./pages/Favorites";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
-import Orders from './pages/Orders';
 import Login from "./pages/Login";
-import ReviewsProvider from './context/ReviewsProvider';
+import Orders from "./pages/Orders";
+import ReviewsProvider from "./context/ReviewsProvider";
+import Footer from "./components/Footer";
+import NotFound from "./pages/NotFound";
+import InfoPage from "./pages/InfoPage";
+import Contact from "./pages/Contact";
+import ConsentProvider from "./context/ConsentProvider";
+import CookieBanner from "./components/CookieBanner";
 
 function Layout() {
   const { pathname } = useLocation();
@@ -28,9 +34,11 @@ function Layout() {
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-slate-200">
+    <div className="flex min-h-screen flex-col bg-white font-sans text-slate-900 selection:bg-slate-200">
       <Navbar overHero={isHome} />
-      <main className={isHome ? "" : "mx-auto max-w-7xl px-6 pt-8"}>
+      <main
+        className={`flex-1 ${isHome ? "" : "mx-auto w-full max-w-7xl px-6 pt-8"}`}
+      >
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/catalogo" element={<Catalog />} />
@@ -41,8 +49,13 @@ function Layout() {
           <Route path="/pedido/:id" element={<OrderConfirmation />} />
           <Route path="/pedidos" element={<Orders />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/institucional/:slug" element={<InfoPage />} />
+          <Route path="/contato" element={<Contact />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
+      <Footer />
+      <CookieBanner />
     </div>
   );
 }
@@ -53,7 +66,9 @@ export default function App() {
       <CartProvider>
         <FavoritesProvider>
           <ReviewsProvider>
-            <Layout />
+            <ConsentProvider>
+              <Layout />
+            </ConsentProvider>
           </ReviewsProvider>
         </FavoritesProvider>
       </CartProvider>
