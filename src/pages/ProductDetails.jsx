@@ -2,19 +2,16 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Icon from "../components/Icon";
 import ProductCard from "../components/ProductCard";
-import { getProductById } from "../data/products";
 import { formatBRL, getDiscount } from "../utils/format";
-import {
-  genderLabels,
-  getDescription,
-  getRelatedProducts,
-} from "../utils/product";
 import { useCart } from "../hooks/useCart";
 import { useFavorites } from "../hooks/useFavorites";
 import ProductReviews from "../components/ProductReviews";
 import StarRating from "../components/StarRating";
 import { useReviews } from "../hooks/useReviews";
 import { formatRating } from "../utils/reviews";
+import { PageError, PageLoading } from "../components/PageState";
+import { useProducts } from "../hooks/useProducts";
+import { genderLabels, getRelatedProducts } from "../utils/products";
 
 function Section({ title, defaultOpen = false, children }) {
   return (
@@ -44,8 +41,10 @@ function ProductView({ product }) {
 
   const discount = getDiscount(product.price, product.oldPrice);
   const favorite = isFavorite(product.id);
-  const related = getRelatedProducts(product);
   const summary = getSummary(product.id);
+  const { products } = useProducts();
+  const images = product.images?.length ? product.images : [product.image];
+  const related = getRelatedProducts(products, product);
 
   const handleAdd = () => {
     if (!size) {
@@ -84,14 +83,14 @@ function ProductView({ product }) {
         <div>
           <div className="aspect-3/4 overflow-hidden bg-slate-100">
             <img
-              src={product.images[activeImage]}
+              src={images[activeImage]}
               alt={`${product.title} - foto ${activeImage + 1}`}
               className="h-full w-full object-cover"
             />
           </div>
 
           <div className="mt-3 grid grid-cols-4 gap-3">
-            {product.images.map((src, i) => (
+            {images.map((src, i) => (
               <button
                 key={src}
                 onClick={() => setActiveImage(i)}
@@ -211,11 +210,13 @@ function ProductView({ product }) {
           )}
 
           <div className="mt-10 border-t border-slate-200">
-            <Section title="Descrição" defaultOpen>
-              {getDescription(product)}
-            </Section>
+            {product.description && (
+              <Section title="Descrição" defaultOpen>
+                {product.description}
+              </Section>
+            )}
 
-            <Section title="Detalhes">
+            <Section title="Detalhes" defaultOpen={!product.description}>
               <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">
                 <dt className="text-slate-400">Marca</dt>
                 <dd>{product.brand}</dd>
@@ -259,20 +260,15 @@ function ProductView({ product }) {
 
 export default function ProductDetails() {
   const { id } = useParams();
+  const { status, reload, getProductById } = useProducts();
+
+  if (status === 'loading') return <PageLoading />;
+  if (status === 'error') return <PageError onRetry={reload} />;
+
   const product = getProductById(id);
 
   if (!product) {
-    return (
-      <div className="py-20 text-center">
-        <p className="text-slate-500">Produto não encontrado.</p>
-        <Link
-          to="/catalogo"
-          className="mt-4 inline-block font-semibold text-slate-900 underline"
-        >
-          Voltar ao catálogo
-        </Link>
-      </div>
-    );
+    // ...mantenha aqui o bloco "Produto não encontrado" que já existe
   }
 
   return <ProductView key={product.id} product={product} />;

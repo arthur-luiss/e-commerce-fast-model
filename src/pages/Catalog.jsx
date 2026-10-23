@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
-import { products, categories, matchesGender } from "../data/products";
 import { useReviews } from "../hooks/useReviews";
+import { PageError, PageLoading } from '../components/PageState';
+import { useProducts } from '../hooks/useProducts';
+import { matchesGender } from '../utils/products';
 
 const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const kidsLabels = { bebe: "Bebês", menina: "Menina", menino: "Menino" };
@@ -10,6 +12,7 @@ const kidsLabels = { bebe: "Bebês", menina: "Menina", menino: "Menino" };
 export default function Catalog() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [sort, setSort] = useState("relevance");
+  const { products, categories, status, reload } = useProducts();
 
   const category = searchParams.get("categoria");
   const genero = searchParams.get("genero");
@@ -49,7 +52,7 @@ export default function Catalog() {
               .toLowerCase()
               .includes(search)),
       ),
-    [genero, publico, marca, tamanho, esporte, promocao, search],
+    [products, genero, publico, marca, tamanho, esporte, promocao, search],
   );
 
   const availableCategories = categories.filter((c) =>
@@ -94,6 +97,9 @@ export default function Catalog() {
   const title = rawSearch
     ? `Resultados para "${rawSearch}"`
     : titleParts.join(" · ") || "Todos os produtos";
+
+    if (status === 'loading') return <PageLoading />;
+    if (status === 'error') return <PageError onRetry={reload} />;
 
   return (
     <div className="pb-20">

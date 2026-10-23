@@ -1,121 +1,85 @@
-import { products, categories, matchesGender } from './products';
-import { brand } from '../config/brand';
+import { compareSizes, matchesGender } from '../utils/products';
 
 const to = (params) => `/catalogo?${new URLSearchParams(params)}`;
+const unique = (values) => [...new Set(values)];
+const byName = (a, b) => a.localeCompare(b);
 
-const adultSizes = ['P', 'M', 'G', 'GG'];
-const kidsSizes = ['0-12M', '1-4', '5-8', '9-12'];
-const exclusiveBrands = ['Urban Basic', 'Street Co.'];
+const kidsLabels = { bebe: 'Bebês', menina: 'Menina', menino: 'Menino' };
 
-const brandsOf = (filter) => [...new Set(products.filter(filter).map((p) => p.brand))];
+// Monta um menu só com o que existe nos produtos: nunca gera link para uma página vazia.
+function buildMenu(products, base, filter, extraColumns = []) {
+  const scoped = products.filter(filter);
 
-const categoriesOf = (filter) =>
-  categories.filter(
-    (c) => c !== 'Acessórios' && products.some((p) => p.category === c && filter(p))
-  );
+  const categories = unique(scoped.map((p) => p.category));
+  const sizes = unique(scoped.flatMap((p) => p.sizes))
+    .filter((s) => s !== 'Único')
+    .sort(compareSizes);
+  const brands = unique(scoped.map((p) => p.brand)).sort(byName);
 
-const clothesColumn = ({ title = 'Roupas', base, filter, sizes }) => ({
-  title,
-  links: categoriesOf(filter).map((c) => ({ label: c, to: to({ ...base, categoria: c }) })),
-  sizes: sizes.map((s) => ({ label: s, to: to({ ...base, tamanho: s }) })),
-  seeAll: to(base),
-});
+  const columns = [...extraColumns];
 
-const accessoriesColumn = (base, items) => ({
-  title: 'Acessórios',
-  links: items.map((a) => ({ label: a.label, to: to({ ...base, busca: a.term }) })),
-  seeAll: to({ ...base, categoria: 'Acessórios' }),
-});
+  if (categories.length > 0) {
+    columns.push({
+      title: 'Categorias',
+      links: categories.map((c) => ({ label: c, to: to({ ...base, categoria: c }) })),
+      sizes: sizes.map((s) => ({ label: s, to: to({ ...base, tamanho: s }) })),
+      seeAll: to(base),
+    });
+  }
 
-const brandsColumn = (base, filter) => ({
-  title: 'Marcas',
-  links: brandsOf(filter).map((b) => ({ label: b, to: to({ ...base, marca: b }) })),
-  seeAll: to(base),
-});
+  if (brands.length > 0) {
+    columns.push({
+      title: 'Marcas',
+      links: brands.map((b) => ({ label: b, to: to({ ...base, marca: b }) })),
+    });
+  }
 
-const highlightsColumn = (base) => ({
-  title: 'Destaques',
-  links: [{ label: 'Em promoção', to: to({ ...base, promocao: '1' }) }],
-  seeAll: to({ ...base, promocao: '1' }),
-});
+  if (scoped.some((p) => p.oldPrice)) {
+    columns.push({
+      title: 'Destaques',
+      links: [{ label: 'Em promoção', to: to({ ...base, promocao: '1' }) }],
+    });
+  }
 
-const adultMenu = (genero, accessories) => {
-  const base = { genero };
-  const filter = (p) => matchesGender(p, genero);
-  return {
-    to: to(base),
-    columns: [
-      clothesColumn({ base, filter, sizes: adultSizes }),
-      accessoriesColumn(base, accessories),
-      brandsColumn(base, filter),
-      highlightsColumn(base),
-    ],
-  };
-};
+  return { to: to(base), columns };
+}
 
-const kidsMenu = () => {
-  const base = { genero: 'infantil' };
-  const filter = (p) => p.gender === 'infantil';
-  return {
-    to: to(base),
-    columns: [
-      {
-        title: 'Público',
-        links: [
-          { label: 'Bebês', to: to({ ...base, publico: 'bebe' }) },
-          { label: 'Menina', to: to({ ...base, publico: 'menina' }) },
-          { label: 'Menino', to: to({ ...base, publico: 'menino' }) },
-        ],
-        seeAll: to(base),
-      },
-      clothesColumn({ base, filter, sizes: kidsSizes }),
-      accessoriesColumn(base, [{ label: 'Bonés', term: 'Boné' }]),
-      brandsColumn(base, filter),
-      highlightsColumn(base),
-    ],
-  };
-};
+export function buildMenus(products) {
+  const menus = {};
 
-const sportMenu = () => {
-  const base = { esporte: '1' };
-  const filter = (p) => p.sport;
-  return {
-    to: to(base),
-    columns: [
-      clothesColumn({ title: 'Moda esportiva', base, filter, sizes: adultSizes }),
-      brandsColumn(base, filter),
-      highlightsColumn(base),
-    ],
-  };
-};
+  for (const [name, genero] of [['Feminino', 'feminino'], ['Masculino', 'masculino']]) {
+    const filter = (p) => matchesGender(p, genero);
+    if (products.some(filter)) menus[name] = buildMenu(products, { genero }, filter);
+  }
 
-const brandsMenu = () => ({
-  to: '/catalogo',
-  columns: [
-    {
-      title: `Exclusivas na ${brand.name}`,
-      links: exclusiveBrands.map((b) => ({ label: b, to: to({ marca: b }) })),
-      seeAll: '/catalogo',
-    },
-    {
-      title: 'Marcas parceiras',
-      links: brandsOf((p) => !exclusiveBrands.includes(p.brand)).map((b) => ({
-        label: b,
-        to: to({ marca: b }),
-      })),
-      seeAll: '/catalogo',
-    },
-  ],
-});
+  const kids = products.filter((p) => p.gender === 'infantil');
+  if (kids.length > 0) {
+    const publico = {
+      title: 'Público',
+      links: Object.entries(kidsLabels)
+        .filter(([key]) => kids.some((p) => p.kids === key))
+        .map(([key, label]) => ({ label, to: to({ genero: 'infantil', publico: key }) })),
+    };
+    menus.Infantil = buildMenu(products, { genero: 'infantil' }, (p) => p.gender === 'infantil', [publico]);
+  }
 
-// A ordem das chaves é a ordem exibida no cabeçalho.
-export const menus = {
-  Feminino: adultMenu('feminino', [{ label: 'Bonés', term: 'Boné' }]),
-  Masculino: adultMenu('masculino', [
-    { label: 'Bonés', term: 'Boné' },
-    { label: 'Cintos', term: 'Cinto' },
-  ]),
-  Infantil: kidsMenu(),
-  Esportivo: sportMenu(),
-  Marcas: brandsMenu(),
-};
+  if (products.some((p) => p.sport)) {
+    menus.Esportivo = buildMenu(products, { esporte: '1' }, (p) => p.sport);
+  }
+
+  const brands = unique(products.map((p) => p.brand)).sort(byName);
+  if (brands.length > 0) {
+    menus.Marcas = {
+      to: '/catalogo',
+      columns: [
+        {
+          title: 'Marcas',
+          links: brands.map((b) => ({ label: b, to: to({ marca: b }) })),
+          seeAll: '/catalogo',
+        },
+      ],
+    };
+  }
+
+  return menus;
+}

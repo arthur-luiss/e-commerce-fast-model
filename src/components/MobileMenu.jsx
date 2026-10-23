@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { menus } from "../data/menu";
+import { useProducts } from '../hooks/useProducts';
 import Icon from "./Icon";
 
 export default function MobileMenu({ open, onClose }) {
   const [openSection, setOpenSection] = useState(null);
+  const { menus } = useProducts();
 
   useEffect(() => {
     if (!open) return;

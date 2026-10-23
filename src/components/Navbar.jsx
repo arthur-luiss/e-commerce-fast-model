@@ -2,13 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../hooks/useCart";
 import { useFavorites } from "../hooks/useFavorites";
-import { menus } from "../data/menu";
 import Icon from "./Icon";
 import MegaMenu from "./MegaMenu";
 import MobileMenu from "./MobileMenu";
 import Logo from "./Logo";
-
-const navItems = Object.keys(menus);
+import { useProducts } from '../hooks/useProducts';
 
 export default function Navbar({ overHero = false }) {
   const { totalItems } = useCart();
@@ -18,6 +16,8 @@ export default function Navbar({ overHero = false }) {
   const [activeMenu, setActiveMenu] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(() => window.scrollY > 10);
+  const { menus } = useProducts();
+  const navItems = Object.keys(menus);
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 

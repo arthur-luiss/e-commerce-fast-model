@@ -23,6 +23,7 @@ import InfoPage from "./pages/InfoPage";
 import Contact from "./pages/Contact";
 import ConsentProvider from "./context/ConsentProvider";
 import CookieBanner from "./components/CookieBanner";
+import ProductsProvider from './context/ProductsProvider';
 
 function Layout() {
   const { pathname } = useLocation();
@@ -60,16 +61,18 @@ function Layout() {
 
 export default function App() {
   return (
-    <Router>
-      <CartProvider>
-        <FavoritesProvider>
-          <ReviewsProvider>
-            <ConsentProvider>
-              <Layout />
-            </ConsentProvider>
-          </ReviewsProvider>
-        </FavoritesProvider>
-      </CartProvider>
-    </Router>
+<Router>
+  <ProductsProvider>
+    <CartProvider>
+      <FavoritesProvider>
+        <ReviewsProvider>
+          <ConsentProvider>
+            <Layout />
+          </ConsentProvider>
+        </ReviewsProvider>
+      </FavoritesProvider>
+    </CartProvider>
+  </ProductsProvider>
+</Router>
   );
 }

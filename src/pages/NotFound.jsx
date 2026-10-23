@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LogoMark } from '../components/Logo';
-import { categories } from '../data/products';
+import { useProducts } from '../hooks/useProducts'
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
-export default function NotFound() {
+export default function NotFound(){
   useDocumentTitle('Página não encontrada');
+  const { categories } = useProducts();
+  
 
   // A hospedagem responde "200 OK" para qualquer endereço; isto pede aos buscadores que não indexem a página
   useEffect(() => {
@@ -46,20 +48,22 @@ export default function NotFound() {
         </Link>
       </div>
 
-      <div className="mt-10">
-        <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-400">Ou vá direto para</p>
-        <div className="flex flex-wrap justify-center gap-2">
-          {categories.map((cat) => (
-            <Link
-              key={cat}
-              to={`/catalogo?categoria=${encodeURIComponent(cat)}`}
-              className="rounded-full border border-slate-200 px-4 py-1.5 text-sm text-slate-600 hover:border-slate-900 hover:text-slate-900"
-            >
-              {cat}
-            </Link>
-          ))}
+      {categories.length > 0 && (
+        <div className="mt-10">
+          <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-400">Ou vá direto para</p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {categories.map((cat) => (
+              <Link
+                key={cat}
+                to={`/catalogo?categoria=${encodeURIComponent(cat)}`}
+                className="rounded-full border border-slate-200 px-4 py-1.5 text-sm text-slate-600 hover:border-slate-900 hover:text-slate-900"
+              >
+                {cat}
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
