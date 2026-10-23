@@ -84,7 +84,7 @@ export default function Footer() {
             >
               Preferências de cookies
             </button>
-            <span>Loja fictícia criada para demonstração.</span>
+            {brand.demo && <span>Loja fictícia criada para demonstração.</span>}
           </div>
         </div>
       </div>
