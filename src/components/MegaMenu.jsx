@@ -24,24 +24,6 @@ export default function MegaMenu({ menu, onClose }) {
               ))}
             </ul>
 
-            {/* {col.sizes && (
-              <div className="mt-6">
-                <h3 className="mb-3 text-sm font-bold uppercase tracking-wide">Tamanhos</h3>
-                <div className="grid w-32 grid-cols-2 gap-2">
-                  {col.sizes.map((size) => (
-                    <Link
-                      key={size.label}
-                      to={size.to}
-                      onClick={onClose}
-                      className="flex h-12 items-center justify-center rounded-lg border border-slate-300 text-xs font-medium transition-colors hover:border-slate-900 hover:bg-slate-900 hover:text-white"
-                    >
-                      {size.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )} */}
-
             {col.seeAll && (
               <Link
                 to={col.seeAll}
