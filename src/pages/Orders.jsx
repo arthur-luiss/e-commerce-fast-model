@@ -1,21 +1,23 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useNow } from '../hooks/useNow';
+import { PageError, PageLoading } from '../components/PageState';
+import { useAsync } from '../hooks/useAsync';
+import { services } from '../services';
 import { formatBRL } from '../utils/format';
-import { getOrders } from '../utils/orders';
 import { getStatus } from '../utils/tracking';
 
 const tones = {
   amber: 'bg-amber-100 text-amber-700',
   slate: 'bg-slate-100 text-slate-700',
   green: 'bg-green-100 text-green-700',
+  red: 'bg-red-100 text-red-700',
 };
 
 const MAX_THUMBS = 4;
 
 export default function Orders() {
-  const [orders] = useState(getOrders);
-  const now = useNow();
+  const { data: orders, status, reload } = useAsync(() => services.orders.list(), []);
+
+  if (!orders) return status === 'error' ? <PageError onRetry={reload} /> : <PageLoading />;
 
   if (orders.length === 0) {
     return (
@@ -38,7 +40,7 @@ export default function Orders() {
 
       <ul className="space-y-4">
         {orders.map((order) => {
-          const status = getStatus(order, now);
+          const current = getStatus(order);
           const count = order.items.reduce((sum, item) => sum + item.quantity, 0);
           const extra = order.items.length - MAX_THUMBS;
 
@@ -56,8 +58,8 @@ export default function Orders() {
                       {count === 1 ? 'item' : 'itens'}
                     </p>
                   </div>
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${tones[status.tone]}`}>
-                    {status.label}
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${tones[current.tone]}`}>
+                    {current.label}
                   </span>
                 </div>
 

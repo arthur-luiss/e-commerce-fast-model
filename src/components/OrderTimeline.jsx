@@ -1,12 +1,20 @@
 import Icon from './Icon';
-import { steps, getStepIndex, getStepTime, getPaidAt } from '../utils/tracking';
+import { getStepIndex, getStepTime, steps } from '../utils/tracking';
 
 const formatTime = (ms) =>
   new Date(ms).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 
-export default function OrderTimeline({ order, now }) {
-  const current = getStepIndex(order, now);
-  const paid = Boolean(getPaidAt(order));
+export default function OrderTimeline({ order }) {
+  if (order.status === 'cancelled') {
+    const at = getStepTime(order, 'cancelled');
+    return (
+      <p role="status" className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+        Pedido cancelado{at ? ` em ${formatTime(at)}` : ''}.
+      </p>
+    );
+  }
+
+  const current = getStepIndex(order);
   const last = steps.length - 1;
 
   return (
@@ -14,12 +22,11 @@ export default function OrderTimeline({ order, now }) {
       {steps.map((step, i) => {
         const state =
           i < current || (i === current && i === last) ? 'done' : i === current ? 'current' : 'pending';
-        const time = getStepTime(order, i);
-        const reached = time !== null && time <= now;
+        const time = getStepTime(order, step.status);
 
         let detail = null;
-        if (reached) detail = formatTime(time);
-        else if (i === 1 && !paid) detail = 'Aguardando pagamento';
+        if (time && i <= current) detail = formatTime(time);
+        else if (i === 1 && order.status === 'pending') detail = 'Aguardando pagamento';
 
         const circle = {
           done: 'border-slate-900 bg-slate-900 text-white',
@@ -29,7 +36,7 @@ export default function OrderTimeline({ order, now }) {
 
         return (
           <li
-            key={step.id}
+            key={step.status}
             aria-current={state === 'current' ? 'step' : undefined}
             className="relative flex gap-4 pb-8 last:pb-0"
           >

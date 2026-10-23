@@ -1,27 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Field from '../components/Field';
+import { brand } from '../config/brand';
 import { useCart } from '../hooks/useCart';
+import { services } from '../services';
 import { formatBRL } from '../utils/format';
+import { maskCEP, maskCPF, maskPhone, onlyDigits } from '../utils/masks';
 import { getShipping } from '../utils/shipping';
-import { maskCPF, maskPhone, maskCEP, maskCardNumber, maskExpiry, onlyDigits } from '../utils/masks';
 import { validateCheckout } from '../utils/validators';
-import { createOrderId, createPaymentCode, saveOrder } from '../utils/orders';
 
 const initialForm = {
   name: '', email: '', cpf: '', phone: '',
   cep: '', street: '', number: '', complement: '', neighborhood: '', city: '', state: '',
-  method: 'pix',
-  cardNumber: '', cardName: '', cardExpiry: '', cardCvv: '', installments: '1',
+  method: 'pix', installments: '1',
 };
 
 const masks = {
   cpf: maskCPF,
   phone: maskPhone,
   cep: maskCEP,
-  cardNumber: maskCardNumber,
-  cardExpiry: maskExpiry,
-  cardCvv: (v) => onlyDigits(v).slice(0, 4),
   state: (v) => v.replace(/[^a-zA-Z]/g, '').slice(0, 2).toUpperCase(),
 };
 
@@ -54,6 +51,7 @@ export default function Checkout() {
   const [errors, setErrors] = useState({});
   const [attempts, setAttempts] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [cepStatus, setCepStatus] = useState('idle');
   const lastCep = useRef('');
 
@@ -80,6 +78,7 @@ export default function Checkout() {
     );
   }
 
+  // Prévia. O valor oficial é calculado ao criar o pedido.
   const shipping = getShipping(subtotal);
   const total = subtotal + shipping;
 
@@ -144,39 +143,40 @@ export default function Checkout() {
     }
 
     setSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1200)); // simula o processamento
+    setSubmitError('');
 
-    const id = createOrderId();
-    const installments = form.method === 'card' ? Number(form.installments) : 1;
+    try {
+      const order = await services.orders.create({
+        customer: {
+          name: form.name.trim(),
+          email: form.email.trim(),
+          cpf: onlyDigits(form.cpf),
+          phone: onlyDigits(form.phone),
+        },
+        address: {
+          cep: form.cep,
+          street: form.street.trim(),
+          number: form.number.trim(),
+          complement: form.complement.trim(),
+          neighborhood: form.neighborhood.trim(),
+          city: form.city.trim(),
+          state: form.state,
+        },
+        // TODO(pagamento): a cobrança de verdade será feita por um meio de pagamento externo.
+        // Dados de cartão nunca devem passar por este código.
+        payment: {
+          method: form.method,
+          installments: form.method === 'card' ? Number(form.installments) : 1,
+        },
+        items: items.map(({ id, size, quantity }) => ({ productId: id, size, quantity })),
+      });
 
-    saveOrder({
-      id,
-      createdAt: Date.now(),
-      items,
-      subtotal,
-      shipping,
-      total,
-      customer: { name: form.name.trim(), email: form.email.trim() },
-      address: {
-        cep: form.cep,
-        street: form.street.trim(),
-        number: form.number.trim(),
-        complement: form.complement.trim(),
-        neighborhood: form.neighborhood.trim(),
-        city: form.city.trim(),
-        state: form.state,
-      },
-      // Só os 4 últimos dígitos do cartão são guardados
-      payment: {
-        method: form.method,
-        installments,
-        cardLast4: form.method === 'card' ? onlyDigits(form.cardNumber).slice(-4) : null,
-        code: createPaymentCode(form.method, id),
-      },
-    });
-
-    navigate(`/pedido/${id}`, { replace: true });
-    clearCart();
+      navigate(`/pedido/${order.id}`, { replace: true });
+      clearCart();
+    } catch (error) {
+      setSubmitError(error.message || 'Não foi possível finalizar o pedido. Tente novamente.');
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -247,55 +247,28 @@ export default function Checkout() {
             </fieldset>
 
             {form.method === 'card' && (
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <Field
-                  label="Número do cartão"
-                  className="sm:col-span-2"
-                  inputMode="numeric"
-                  autoComplete="cc-number"
-                  placeholder="0000 0000 0000 0000"
-                  {...bind('cardNumber')}
-                />
-                <Field
-                  label="Nome impresso no cartão"
-                  className="sm:col-span-2"
-                  autoComplete="cc-name"
-                  {...bind('cardName')}
-                />
-                <Field label="Validade" inputMode="numeric" autoComplete="cc-exp" placeholder="MM/AA" {...bind('cardExpiry')} />
-                <Field label="CVV" inputMode="numeric" autoComplete="cc-csc" placeholder="123" {...bind('cardCvv')} />
-
-                <div className="sm:col-span-2">
-                  <label htmlFor="installments" className="mb-1 block text-xs font-medium text-slate-600">
-                    Parcelas
-                  </label>
-                  <select
-                    id="installments"
-                    value={form.installments}
-                    onChange={(e) => update('installments', e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-900"
-                  >
-                    {[1, 2, 3, 4, 5, 6].map((n) => (
-                      <option key={n} value={n}>
-                        {`${n}x de ${formatBRL(total / n)} sem juros`}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div className="mt-5">
+                <label htmlFor="installments" className="mb-1 block text-xs font-medium text-slate-600">
+                  Parcelas
+                </label>
+                <select
+                  id="installments"
+                  value={form.installments}
+                  onChange={(e) => update('installments', e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-900"
+                >
+                  {[1, 2, 3, 4, 5, 6].map((n) => (
+                    <option key={n} value={n}>
+                      {`${n}x de ${formatBRL(total / n)} sem juros`}
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
 
-            {form.method === 'pix' && (
-              <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
-                O código Pix será exibido na próxima tela, depois de finalizar o pedido.
-              </p>
-            )}
-
-            {form.method === 'boleto' && (
-              <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
-                O boleto será exibido na próxima tela e vence em 3 dias. O pedido só é processado após a confirmação do pagamento.
-              </p>
-            )}
+            <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
+              Depois de finalizar o pedido, você acompanha o pagamento e a entrega em Meus pedidos.
+            </p>
           </Section>
         </form>
 
@@ -336,19 +309,28 @@ export default function Checkout() {
             </div>
           </div>
 
+          {submitError && (
+            <p role="alert" className="mt-4 text-sm text-red-600">
+              {submitError}
+            </p>
+          )}
+
           <button
             type="submit"
             form="checkout-form"
             disabled={submitting}
             className="mt-6 w-full rounded-full bg-slate-900 py-4 text-sm font-bold text-white transition-colors hover:bg-slate-700 disabled:cursor-wait disabled:opacity-60"
           >
-            {submitting ? 'Processando...' : `Finalizar pedido · ${formatBRL(total)}`}
+            {submitting ? 'Enviando...' : `Finalizar pedido · ${formatBRL(total)}`}
           </button>
-          <p className="mt-3 text-center text-xs text-slate-400">
-            Ambiente de demonstração: nenhum pagamento real é feito.
-          </p>
+
+          {brand.demo && (
+            <p className="mt-3 text-center text-xs text-slate-400">
+              Ambiente de demonstração: nenhum pagamento real é feito.
+            </p>
+          )}
         </aside>
       </div>
     </div>
   );
-}
+} 

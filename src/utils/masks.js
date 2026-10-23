@@ -14,10 +14,3 @@ export const maskPhone = (v) => {
 };
 
 export const maskCEP = (v) => onlyDigits(v).slice(0, 8).replace(/(\d{5})(\d)/, '$1-$2');
-
-export const maskCardNumber = (v) => onlyDigits(v).slice(0, 16).replace(/(\d{4})(?=\d)/g, '$1 ');
-
-export const maskExpiry = (v) => {
-  const d = onlyDigits(v).slice(0, 4);
-  return d.length >= 3 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
-};
