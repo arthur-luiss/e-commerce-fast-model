@@ -1,32 +1,32 @@
-export const STEP_MS = 60 * 1000; // demonstração: 1 minuto por etapa
+export const STATUS_FLOW = ['pending', 'paid', 'preparing', 'shipped', 'delivered'];
+export const ORDER_STATUSES = [...STATUS_FLOW, 'cancelled'];
 
-export const steps = [
-  { id: 'received', label: 'Pedido recebido' },
-  { id: 'paid', label: 'Pagamento confirmado' },
-  { id: 'picking', label: 'Em separação' },
-  { id: 'shipped', label: 'Enviado' },
-  { id: 'delivered', label: 'Entregue' },
-];
+export const statusLabels = {
+  pending: 'Aguardando pagamento',
+  paid: 'Pagamento confirmado',
+  preparing: 'Em separação',
+  shipped: 'Enviado',
+  delivered: 'Entregue',
+  cancelled: 'Cancelado',
+};
 
-export const getPaidAt = (order) =>
-  order.payment.method === 'card' ? order.createdAt : (order.paidAt ?? null);
+// A primeira etapa da linha do tempo é "Pedido recebido", que corresponde ao status inicial "pending"
+export const steps = STATUS_FLOW.map((status) => ({
+  status,
+  label: status === 'pending' ? 'Pedido recebido' : statusLabels[status],
+}));
 
-// Índice da etapa atual (0 = recebido ... 4 = entregue)
-export function getStepIndex(order, now) {
-  const paidAt = getPaidAt(order);
-  if (!paidAt) return 0;
-  return Math.min(steps.length - 1, 1 + Math.floor(Math.max(0, now - paidAt) / STEP_MS));
+export const getStepIndex = (order) => Math.max(0, STATUS_FLOW.indexOf(order.status));
+
+// Momento em que o pedido entrou nesse status; null se ainda não aconteceu
+export function getStepTime(order, status) {
+  const entry = [...(order.history ?? [])].reverse().find((h) => h.status === status);
+  return entry ? entry.at : null;
 }
 
-// Momento em que a etapa foi (ou será) concluída; null se o pedido ainda não foi pago
-export function getStepTime(order, index) {
-  if (index === 0) return order.createdAt;
-  const paidAt = getPaidAt(order);
-  return paidAt ? paidAt + (index - 1) * STEP_MS : null;
-}
+const tones = { pending: 'amber', delivered: 'green', cancelled: 'red' };
 
-export function getStatus(order, now) {
-  if (!getPaidAt(order)) return { label: 'Aguardando pagamento', tone: 'amber' };
-  const index = getStepIndex(order, now);
-  return { label: steps[index].label, tone: index === steps.length - 1 ? 'green' : 'slate' };
-}
+export const getStatus = (order) => ({
+  label: statusLabels[order.status] ?? order.status,
+  tone: tones[order.status] ?? 'slate',
+});

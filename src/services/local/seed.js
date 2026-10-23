@@ -1,7 +1,5 @@
 const img = (seed) => `https://picsum.photos/seed/${seed}/600/800`;
 
-export const categories = ['Camisetas', 'Calças', 'Shorts', 'Vestidos', 'Jaquetas', 'Conjuntos', 'Acessórios'];
-
 const rawProducts = [
   { id: 1,  title: 'Camiseta Básica Algodão',      brand: 'Urban Basic', category: 'Camisetas',  gender: 'unissex',   price: 59.9,  oldPrice: 89.9,  image: img('camiseta1'),  sizes: ['P', 'M', 'G', 'GG'],    featured: true },
   { id: 2,  title: 'Camiseta Oversized Estampada', brand: 'Street Co.',  category: 'Camisetas',  gender: 'unissex',   price: 79.9,  oldPrice: null,  image: img('camiseta2'),  sizes: ['M', 'G', 'GG'],         featured: false },
@@ -30,13 +28,7 @@ const rawProducts = [
   { id: 21, title: 'Boné Infantil Aba Curva',      brand: 'Mini Club',   category: 'Acessórios', gender: 'infantil', kids: 'menino', price: 39.9, oldPrice: null,  image: img('kids6'), sizes: ['Único'],               featured: false },
 ];
 
-export const products = rawProducts.map((p) => ({
+export const seedProducts =  rawProducts.map((p) => ({
   ...p,
   images: [p.image, ...[2, 3, 4].map((n) => p.image.replace('/600/800', `-${n}/600/800`))],
 }));
-
-export const getProductById = (id) => products.find((p) => p.id === Number(id));
-
-// Peça unissex vale para Feminino e Masculino, mas não para Infantil.
-export const matchesGender = (product, gender) =>
-  product.gender === gender || (product.gender === 'unissex' && gender !== 'infantil');
