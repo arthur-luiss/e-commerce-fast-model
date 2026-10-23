@@ -1,25 +1,27 @@
-import { useState } from 'react';
-import Field from './Field';
-import Icon from './Icon';
-import { MAX_COMMENT, MAX_NAME, validateReview } from '../utils/reviews';
+import { useState } from "react";
+import Field from "./Field";
+import Icon from "./Icon";
+import { MAX_COMMENT, MAX_NAME, validateReview } from "../utils/reviews";
 
-const labels = ['', 'Ruim', 'Regular', 'Bom', 'Muito bom', 'Excelente'];
+const labels = ["", "Ruim", "Regular", "Bom", "Muito bom", "Excelente"];
 
 export default function ReviewForm({ productId, alreadyReviewed, onSubmit }) {
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
-  const [name, setName] = useState('');
-  const [comment, setComment] = useState('');
+  const [name, setName] = useState("");
+  const [comment, setComment] = useState("");
   const [errors, setErrors] = useState({});
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   if (alreadyReviewed) {
     return (
       <p className="rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
         {sent
-          ? 'Obrigado! Sua avaliação foi publicada.'
-          : 'Você já avaliou este produto. Para avaliar de novo, exclua a sua avaliação na lista.'}
+          ? "Obrigado! Sua avaliação foi publicada."
+          : "Você já avaliou este produto. Para avaliar de novo, exclua a sua avaliação na lista."}
       </p>
     );
   }
@@ -35,7 +37,7 @@ export default function ReviewForm({ productId, alreadyReviewed, onSubmit }) {
     );
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const found = validateReview({ rating, name, comment });
     if (Object.keys(found).length > 0) {
@@ -43,43 +45,64 @@ export default function ReviewForm({ productId, alreadyReviewed, onSubmit }) {
       return;
     }
 
-    onSubmit({ productId, rating, name, comment });
-    setSent(true);
-    setOpen(false);
-    setRating(0);
-    setName('');
-    setComment('');
-    setErrors({});
+    setSubmitting(true);
+    setSubmitError("");
+    try {
+      await onSubmit({ productId, rating, name, comment });
+      setSent(true);
+      setOpen(false);
+      setRating(0);
+      setName("");
+      setComment("");
+      setErrors({});
+    } catch {
+      setSubmitError("Não foi possível publicar a avaliação. Tente novamente.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const shown = hover || rating;
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-4 rounded-xl border border-slate-200 p-5">
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      className="space-y-4 rounded-xl border border-slate-200 p-5"
+    >
       <div>
-        <p id="rating-label" className="mb-1 text-xs font-medium text-slate-600">
+        <p
+          id="rating-label"
+          className="mb-1 text-xs font-medium text-slate-600"
+        >
           Sua nota
         </p>
-        <div role="radiogroup" aria-labelledby="rating-label" className="flex items-center gap-1">
+        <div
+          role="radiogroup"
+          aria-labelledby="rating-label"
+          className="flex items-center gap-1"
+        >
           {[1, 2, 3, 4, 5].map((n) => (
             <button
               key={n}
               type="button"
               role="radio"
               aria-checked={rating === n}
-              aria-label={`${n} ${n === 1 ? 'estrela' : 'estrelas'}`}
+              aria-label={`${n} ${n === 1 ? "estrela" : "estrelas"}`}
               onClick={() => {
                 setRating(n);
                 setErrors((e) => ({ ...e, rating: undefined }));
               }}
               onMouseEnter={() => setHover(n)}
               onMouseLeave={() => setHover(0)}
-              className={`p-0.5 transition-colors ${n <= shown ? 'text-amber-400' : 'text-slate-300'}`}
+              className={`p-0.5 transition-colors ${n <= shown ? "text-amber-400" : "text-slate-300"}`}
             >
               <Icon name="star" className="h-8 w-8" filled />
             </button>
           ))}
-          {shown > 0 && <span className="ml-2 text-sm text-slate-500">{labels[shown]}</span>}
+          {shown > 0 && (
+            <span className="ml-2 text-sm text-slate-500">{labels[shown]}</span>
+          )}
         </div>
         {errors.rating && (
           <p role="alert" className="mt-1 text-xs text-red-600">
@@ -102,7 +125,10 @@ export default function ReviewForm({ productId, alreadyReviewed, onSubmit }) {
       />
 
       <div>
-        <label htmlFor="review-comment" className="mb-1 block text-xs font-medium text-slate-600">
+        <label
+          htmlFor="review-comment"
+          className="mb-1 block text-xs font-medium text-slate-600"
+        >
           Sua avaliação
         </label>
         <textarea
@@ -116,11 +142,16 @@ export default function ReviewForm({ productId, alreadyReviewed, onSubmit }) {
             setErrors((er) => ({ ...er, comment: undefined }));
           }}
           className={`w-full resize-y rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors ${
-            errors.comment ? 'border-red-400 focus:border-red-500' : 'border-slate-300 focus:border-slate-900'
+            errors.comment
+              ? "border-red-400 focus:border-red-500"
+              : "border-slate-300 focus:border-slate-900"
           }`}
         />
         <div className="mt-1 flex justify-between text-xs">
-          <span role={errors.comment ? 'alert' : undefined} className="text-red-600">
+          <span
+            role={errors.comment ? "alert" : undefined}
+            className="text-red-600"
+          >
             {errors.comment}
           </span>
           <span className="text-slate-400">
@@ -133,12 +164,22 @@ export default function ReviewForm({ productId, alreadyReviewed, onSubmit }) {
         <button
           type="submit"
           className="flex-1 rounded-full bg-slate-900 py-3 text-sm font-bold text-white hover:bg-slate-700"
+          disabled={submitting}
         >
-          Publicar avaliação
+          Publicar avaliação {submitError && (
+          <p role="alert" className="text-sm text-red-600">
+            {submitError}
+          </p>
+        )}
         </button>
+        {submitError && (
+          <p role="alert" className="text-sm text-red-600">
+            {submitError}
+          </p>  
+        )}
         <button
           type="button"
-          onClick={() => setOpen(false)}
+          onClick={() => setOpen(false)}    
           className="rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold hover:border-slate-900"
         >
           Cancelar
