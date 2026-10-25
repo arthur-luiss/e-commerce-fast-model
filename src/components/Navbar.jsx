@@ -90,7 +90,7 @@ export default function Navbar({ overHero = false }) {
           </form>
 
           <div className="flex items-center justify-end gap-5">
-            <Link to="/" className="hidden text-sm font-medium md:block">
+            <Link to="/login" className="hidden text-sm font-medium md:block">
               Entrar
             </Link>
             <Link

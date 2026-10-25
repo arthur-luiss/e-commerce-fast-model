@@ -78,7 +78,7 @@ export default function Catalog() {
   };
 
   const chip = (active) =>
-    `shrink-0 rounded-full border px-4 py-1.5 text-sm transition-colors ${
+    `shrink-0 cursor-pointer rounded-full border px-4 py-1.5 text-sm transition-colors hover:cursor-pointer ${
       active
         ? "border-slate-900 bg-slate-900 text-white"
         : "border-slate-200 text-slate-600 hover:border-slate-900 hover:text-slate-900"
@@ -111,7 +111,7 @@ export default function Catalog() {
             {hasFilters && (
               <button
                 onClick={() => setSearchParams({})}
-                className="ml-3 font-medium text-slate-900 underline underline-offset-2"
+                className="ml-3 font-medium text-slate-900 underline underline-offset-2 cursor-pointer"
               >
                 Limpar filtros
               </button>
@@ -123,7 +123,7 @@ export default function Catalog() {
           value={sort}
           onChange={(e) => setSort(e.target.value)}
           aria-label="Ordenar produtos"
-          className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 outline-none hover:border-slate-900"
+          className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 outline-none hover:border-slate-900 cursor-pointer"
         >
           <option value="rating">Melhor avaliados</option>
           <option value="relevance">Relevância</option>
@@ -133,7 +133,7 @@ export default function Catalog() {
       </div>
 
       {availableCategories.length > 1 && (
-        <div className="mb-8 flex gap-2 overflow-x-auto pb-1 scrollbar-width:none">
+        <div className="mb-8 flex gap-2  overflow-x-auto pb-1 scrollbar-width:none">
           <button
             onClick={() => selectCategory(null)}
             className={chip(!category)}

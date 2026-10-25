@@ -15,6 +15,7 @@ import FavoritesProvider from "./context/FavoritesProvider";
 import Favorites from "./pages/Favorites";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import Login from "./pages/Login";
 import Orders from "./pages/Orders";
 import ReviewsProvider from "./context/ReviewsProvider";
 import Footer from "./components/Footer";
@@ -48,6 +49,7 @@ function Layout() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/pedido/:id" element={<OrderConfirmation />} />
           <Route path="/pedidos" element={<Orders />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/institucional/:slug" element={<InfoPage />} />
           <Route path="/contato" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
