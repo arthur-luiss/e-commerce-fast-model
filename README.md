@@ -4,7 +4,7 @@ Front-end de um e-commerce de moda feminina, masculina e infantil, inspirado na 
 
 **Demonstração:** https://model-kappa-five.vercel.app/
 
-> Os dados são simulados (mock). Não há back-end nem pagamento real.
+> Produtos e pagamentos são simulados. A API já oferece autenticação e consulta protegida do perfil do usuário.
 
 ## Funcionalidades
 
@@ -24,6 +24,7 @@ Front-end de um e-commerce de moda feminina, masculina e infantil, inspirado na 
 - [React Router 7](https://reactrouter.com/)
 - [Tailwind CSS 4](https://tailwindcss.com/) (via `@tailwindcss/postcss`)
 - Estado global com Context API (carrinho e favoritos)
+- API em Node.js/Express com PostgreSQL e autenticação JWT
 
 ## Como rodar
 
@@ -37,6 +38,14 @@ npm run dev
 ```
 
 O projeto abre em `http://localhost:5173`.
+
+Para iniciar a API, configure `JWT_SECRET` e as variáveis de conexão `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` e `DB_NAME` no arquivo `server/.env`. Depois execute:
+
+```bash
+cd server
+npm install
+npm run dev
+```
 
 | Comando           | O que faz                          |
 | ----------------- | ---------------------------------- |
@@ -73,6 +82,16 @@ Os filtros ficam na URL, então qualquer busca pode ser compartilhada ou recarre
 | `busca`     | `?busca=jeans`                | Texto digitado na barra de busca            |
 
 Os parâmetros podem ser combinados: `/catalogo?genero=feminino&categoria=Vestidos&tamanho=M`.
+
+## API de autenticação
+
+| Método | Rota                  | Acesso | Descrição                                      |
+| ------ | --------------------- | ------ | ---------------------------------------------- |
+| POST   | `/api/auth/register`  | Público | Cadastro e emissão de token JWT                |
+| POST   | `/api/auth/login`     | Público | Login e emissão de token JWT                   |
+| GET    | `/api/user/profile`   | JWT    | Consulta o perfil do usuário autenticado       |
+
+Envie o token do login no cabeçalho `Authorization: Bearer <token>` para consultar o perfil.
 
 ## Estrutura
 
@@ -125,7 +144,7 @@ O projeto está publicado na [Vercel](https://vercel.com/). Como é uma aplicaç
 ## Próximos passos
 
 - [X] Checkout (dados, endereço e pagamento simulados)
+- [X] Autenticação JWT e consulta protegida de perfil
 - [ ] Avaliações de produtos
 - [ ] Tabela de medidas e cálculo de frete por CEP
 - [ ] Fotos e descrições reais dos produtos
-- [ ] Back-end e autenticação

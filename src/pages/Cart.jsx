@@ -40,7 +40,7 @@ export default function Cart() {
         <h1 className="text-2xl font-black">Carrinho</h1>
         <button
           onClick={clearCart}
-          className="text-sm font-semibold text-slate-500 hover:text-red-600"
+          className="cursor-pointer text-sm font-semibold text-slate-500 hover:text-red-600"
         >
           Esvaziar carrinho
         </button>
@@ -87,7 +87,7 @@ export default function Cart() {
                         updateQuantity(item.key, item.quantity - 1)
                       }
                       disabled={item.quantity <= 1}
-                      className="px-3 py-1 text-lg text-slate-600 disabled:opacity-30"
+                      className="cursor-pointer px-3 py-1 text-lg text-slate-600 disabled:opacity-30"
                       aria-label="Diminuir quantidade"
                     >
                       −
@@ -100,7 +100,7 @@ export default function Cart() {
                         updateQuantity(item.key, item.quantity + 1)
                       }
                       disabled={item.quantity >= maxQuantity}
-                      className="px-3 py-1 text-lg text-slate-600 disabled:opacity-30"
+                      className="cursor-pointer px-3 py-1 text-lg text-slate-600 disabled:opacity-30"
                       aria-label="Aumentar quantidade"
                     >
                       +
@@ -109,7 +109,7 @@ export default function Cart() {
 
                   <button
                     onClick={() => removeItem(item.key)}
-                    className="text-sm font-semibold text-slate-500 hover:text-red-600"
+                    className="cursor-pointer text-sm font-semibold text-slate-500 hover:text-red-600"
                   >
                     Remover
                   </button>

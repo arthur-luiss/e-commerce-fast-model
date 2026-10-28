@@ -4,14 +4,28 @@ import { useFavorites } from "../hooks/useFavorites";
 import Icon from "./Icon";
 import StarRating from "./StarRating";
 import { useReviews } from "../hooks/useReviews";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import { hasStoredSession } from "../utils/userStorage";
 
 export default function ProductCard({ product }) {
   const { id, title, brand, price, oldPrice, image, sizes } = product;
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const discount = getDiscount(price, oldPrice);
   const favorite = isFavorite(id);
   const { getSummary } = useReviews();
   const { average, count } = getSummary(id);
+
+  const handleFavorite = () => {
+    if (!isAuthenticated || !hasStoredSession()) {
+      navigate("/login");
+      return;
+    }
+
+    toggleFavorite(id);
+  };
 
   return (
     <div className="group relative">
@@ -58,12 +72,12 @@ export default function ProductCard({ product }) {
 
       <button
         type="button"
-        onClick={() => toggleFavorite(id)}
+        onClick={handleFavorite}
         aria-label={
           favorite ? "Remover dos favoritos" : "Adicionar aos favoritos"
         }
         aria-pressed={favorite}
-        className={`absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm transition-colors hover:bg-white ${
+        className={`absolute right-2 top-2 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-white/90 shadow-sm transition-colors hover:bg-white ${
           favorite ? "text-red-500" : "text-slate-700 hover:text-red-500"
         }`}
       >

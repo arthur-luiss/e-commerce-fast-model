@@ -80,7 +80,7 @@ export default function Footer() {
             <button
               type="button"
               onClick={openPreferences}
-              className="font-medium text-slate-700 underline hover:text-slate-900"
+              className="cursor-pointer font-medium text-slate-700 underline hover:text-slate-900"
             >
               Preferências de cookies
             </button>

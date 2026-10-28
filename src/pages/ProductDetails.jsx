@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Icon from "../components/Icon";
 import ProductCard from "../components/ProductCard";
 import { formatBRL, getDiscount } from "../utils/format";
 import { useCart } from "../hooks/useCart";
 import { useFavorites } from "../hooks/useFavorites";
+import { useAuth } from "../hooks/useAuth";
+import { hasStoredSession } from "../utils/userStorage";
 import ProductReviews from "../components/ProductReviews";
 import StarRating from "../components/StarRating";
 import { useReviews } from "../hooks/useReviews";
@@ -50,6 +52,8 @@ function Section({ title, defaultOpen = false, children }) {
 
 function ProductView({ product }) {
   const { addItem } = useCart();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [activeImage, setActiveImage] = useState(0);
   const [size, setSize] = useState(null);
@@ -65,6 +69,11 @@ function ProductView({ product }) {
   const galleryImages = getGalleryImages(product);
 
   const handleAdd = () => {
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: `/produto/${product.id}` } });
+      return;
+    }
+
     if (!size) {
       setShowError(true);
       return;
@@ -205,7 +214,13 @@ function ProductView({ product }) {
               Adicionar ao carrinho
             </button>
             <button
-              onClick={() => toggleFavorite(product.id)}
+              onClick={() => {
+                if (!isAuthenticated || !hasStoredSession()) {
+                  navigate("/login");
+                  return;
+                }
+                toggleFavorite(product.id);
+              }}
               aria-label={
                 favorite ? "Remover dos favoritos" : "Adicionar aos favoritos"
               }
@@ -285,8 +300,8 @@ export default function ProductDetails() {
   const { id } = useParams();
   const { status, reload, getProductById } = useProducts();
 
-  if (status === 'loading') return <PageLoading />;
-  if (status === 'error') return <PageError onRetry={reload} />;
+  if (status === "loading") return <PageLoading />;
+  if (status === "error") return <PageError onRetry={reload} />;
 
   const product = getProductById(id);
 

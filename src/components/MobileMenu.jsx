@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useProducts } from '../hooks/useProducts';
+import { useProducts } from "../hooks/useProducts";
 import Icon from "./Icon";
+import { useAuth } from "../hooks/useAuth";
 
 export default function MobileMenu({ open, onClose }) {
   const [openSection, setOpenSection] = useState(null);
   const { menus } = useProducts();
+  const { user, isAuthenticated, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    window.location.assign("/");
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -126,9 +133,31 @@ export default function MobileMenu({ open, onClose }) {
           })}
         </nav>
         <div className="shrink-0 space-y-3 border-t border-slate-200 px-6 py-4 text-sm font-medium">
-          <Link to="/login" onClick={onClose} className="block">
-            Entrar
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <p className="text-xs text-slate-500 cursor-pointer">
+                Olá, {user?.name?.split(/\s+/)[0]}
+              </p>
+              <Link
+                to="/dashboard"
+                onClick={onClose}
+                className="block cursor-pointer"
+              >
+                Meu painel
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="block cursor-pointer text-left text-red-600"
+              >
+                Sair
+              </button>
+            </>
+          ) : (
+            <Link to="/login" onClick={onClose} className="block">
+              Entrar
+            </Link>
+          )}
           <Link to="/pedidos" onClick={onClose} className="block">
             Meus pedidos
           </Link>
