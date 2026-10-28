@@ -24,7 +24,10 @@ import InfoPage from "./pages/InfoPage";
 import Contact from "./pages/Contact";
 import ConsentProvider from "./context/ConsentProvider";
 import CookieBanner from "./components/CookieBanner";
-import ProductsProvider from './context/ProductsProvider';
+import ProductsProvider from "./context/ProductsProvider";
+import AuthProvider from "./context/AuthProvider";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Dashboard from "./pages/Dashboard";
 
 function Layout() {
   const { pathname } = useLocation();
@@ -44,9 +47,12 @@ function Layout() {
           <Route path="/" element={<Home />} />
           <Route path="/catalogo" element={<Catalog />} />
           <Route path="/produto/:id" element={<ProductDetails />} />
-          <Route path="/carrinho" element={<Cart />} />
           <Route path="/favoritos" element={<Favorites />} />
-          <Route path="/checkout" element={<Checkout />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/carrinho" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Route>
           <Route path="/pedido/:id" element={<OrderConfirmation />} />
           <Route path="/pedidos" element={<Orders />} />
           <Route path="/login" element={<Login />} />
@@ -63,18 +69,20 @@ function Layout() {
 
 export default function App() {
   return (
-<Router>
-  <ProductsProvider>
-    <CartProvider>
-      <FavoritesProvider>
-        <ReviewsProvider>
-          <ConsentProvider>
-            <Layout />
-          </ConsentProvider>
-        </ReviewsProvider>
-      </FavoritesProvider>
-    </CartProvider>
-  </ProductsProvider>
-</Router>
+    <Router>
+      <AuthProvider>
+        <ProductsProvider>
+          <CartProvider>
+            <FavoritesProvider>
+              <ReviewsProvider>
+                <ConsentProvider>
+                  <Layout />
+                </ConsentProvider>
+              </ReviewsProvider>
+            </FavoritesProvider>
+          </CartProvider>
+        </ProductsProvider>
+      </AuthProvider>
+    </Router>
   );
 }

@@ -6,7 +6,8 @@ import Icon from "./Icon";
 import MegaMenu from "./MegaMenu";
 import MobileMenu from "./MobileMenu";
 import Logo from "./Logo";
-import { useProducts } from '../hooks/useProducts';
+import { useProducts } from "../hooks/useProducts";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Navbar({ overHero = false }) {
   const { totalItems } = useCart();
@@ -15,8 +16,10 @@ export default function Navbar({ overHero = false }) {
   const [query, setQuery] = useState("");
   const [activeMenu, setActiveMenu] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(() => window.scrollY > 10);
   const { menus } = useProducts();
+  const { user, isAuthenticated, logout } = useAuth();
   const navItems = Object.keys(menus);
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);
@@ -46,6 +49,20 @@ export default function Navbar({ overHero = false }) {
       term ? `/catalogo?busca=${encodeURIComponent(term)}` : "/catalogo",
     );
   };
+
+  const handleLogout = () => {
+    logout();
+    window.location.assign("/");
+  };
+
+  const firstName = user?.name?.trim().split(/\s+/)[0] || "Minha conta";
+  const initials = user?.name
+    ?.trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
 
   const badge =
     "absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-slate-900 px-1 text-[10px] font-bold text-white ring-2 ring-white";
@@ -90,9 +107,49 @@ export default function Navbar({ overHero = false }) {
           </form>
 
           <div className="flex items-center justify-end gap-5">
-            <Link to="/login" className="hidden text-sm font-medium md:block">
-              Entrar
-            </Link>
+            {isAuthenticated ? (
+              <div className="relative hidden md:block">
+                <button
+                  type="button"
+                  onClick={() => setProfileOpen((open) => !open)}
+                  aria-expanded={profileOpen}
+                  aria-haspopup="menu"
+                  className="flex cursor-pointer items-center gap-2 text-sm font-medium"
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
+                    {initials}
+                  </span>
+                  <span className="max-w-24 truncate">{firstName}</span>
+                </button>
+                {profileOpen && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-full mt-3 w-48 rounded-xl border border-slate-200 bg-white p-2 text-slate-900 shadow-lg"
+                  >
+                    <Link
+                      to="/dashboard"
+                      role="menuitem"
+                      onClick={() => setProfileOpen(false)}
+                      className="block cursor-pointer rounded-lg px-3 py-2 text-sm hover:bg-slate-100"
+                    >
+                      Meu painel
+                    </Link>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={handleLogout}
+                      className="w-full cursor-pointer rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                    >
+                      Sair
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/login" className="hidden text-sm font-medium md:block">
+                Entrar
+              </Link>
+            )}
             <Link
               to="/pedidos"
               aria-label="Meus pedidos"
@@ -106,7 +163,7 @@ export default function Navbar({ overHero = false }) {
               className="relative opacity-90 hover:opacity-100"
             >
               <Icon name="heart" className="h-5 w-5" />
-              {favoritesCount > 0 && (
+              {isAuthenticated && favoritesCount > 0 && (
                 <span className={badge}>{favoritesCount}</span>
               )}
             </Link>
@@ -116,7 +173,9 @@ export default function Navbar({ overHero = false }) {
               className="relative opacity-90 hover:opacity-100"
             >
               <Icon name="bag" className="h-5 w-5" />
-              {totalItems > 0 && <span className={badge}>{totalItems}</span>}
+              {isAuthenticated && totalItems > 0 && (
+                <span className={badge}>{totalItems}</span>
+              )}
             </Link>
           </div>
         </div>

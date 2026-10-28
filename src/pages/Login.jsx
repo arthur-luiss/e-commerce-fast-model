@@ -1,20 +1,52 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 const inputClasses =
   "mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200";
 
+function loadRememberedEmail() {
+  try {
+    return localStorage.getItem("remembered_email") || "";
+  } catch (error) {
+    console.error("Não foi possível carregar o e-mail lembrado:", error);
+    return "";
+  }
+}
+
 export default function Login() {
   const [mode, setMode] = useState("login");
   const [notice, setNotice] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [remembered, setRemembered] = useState(() => {
+    const savedEmail = loadRememberedEmail();
+    return { email: savedEmail, checked: Boolean(savedEmail) };
+  });
+  const { email, checked: rememberMe } = remembered;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+
+  useEffect(() => {
+    const handleStorage = (event) => {
+      if (event.key !== "remembered_email") return;
+      const savedEmail = event.newValue || "";
+      setRemembered({ email: savedEmail, checked: Boolean(savedEmail) });
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   const selectMode = (nextMode) => {
     setMode(nextMode);
     setNotice("");
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
+    setNotice("");
 
     if (
       mode === "register" &&
@@ -26,9 +58,61 @@ export default function Login() {
       return;
     }
 
-    setNotice(
-      "A autenticação ainda não está conectada. Seus dados não foram enviados.",
-    );
+    const payload = {
+      email: String(form.get("email") || "").trim(),
+      password: form.get("password"),
+    };
+    if (mode === "register") payload.name = form.get("fullName");
+
+    if (mode === "login") {
+      try {
+        if (form.get("remember")) {
+          localStorage.setItem("remembered_email", payload.email);
+        } else {
+          localStorage.removeItem("remembered_email");
+        }
+      } catch (error) {
+        console.error("Não foi possível atualizar o e-mail lembrado:", error);
+      }
+    }
+
+    setSubmitting(true);
+
+    try {
+      const endpoint = mode === "register" ? "register" : "login";
+      const response = await fetch(
+        `http://localhost:5000/api/auth/${endpoint}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Não foi possível autenticar. Tente novamente.",
+        );
+      }
+
+      if (!data.token || !data.user) {
+        throw new Error(
+          "A resposta do servidor está incompleta. Tente novamente.",
+        );
+      }
+
+      login(data.user, data.token);
+      navigate(location.state?.from || "/dashboard", { replace: true });
+    } catch (error) {
+      setNotice(
+        error instanceof TypeError
+          ? "Não foi possível conectar ao servidor. Verifique se a API está disponível."
+          : error.message || "Ocorreu um erro. Tente novamente.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -94,6 +178,7 @@ export default function Login() {
                 name="fullName"
                 type="text"
                 autoComplete="name"
+                minLength={2}
                 required
                 className={inputClasses}
                 placeholder="Seu nome"
@@ -113,6 +198,13 @@ export default function Login() {
               name="email"
               type="email"
               autoComplete="email"
+              value={email}
+              onChange={(event) =>
+                setRemembered((current) => ({
+                  ...current,
+                  email: event.target.value,
+                }))
+              }
               required
               className={inputClasses}
               placeholder="voce@exemplo.com"
@@ -133,6 +225,7 @@ export default function Login() {
               autoComplete={
                 mode === "login" ? "current-password" : "new-password"
               }
+              minLength={mode === "register" ? 8 : undefined}
               required
               className={inputClasses}
               placeholder="Digite sua senha"
@@ -163,6 +256,13 @@ export default function Login() {
                 <input
                   name="remember"
                   type="checkbox"
+                  checked={rememberMe}
+                  onChange={(event) =>
+                    setRemembered((current) => ({
+                      ...current,
+                      checked: event.target.checked,
+                    }))
+                  }
                   className="h-4 w-4 cursor-pointer rounded border-slate-300 accent-slate-900 focus:ring-slate-400"
                 />
                 Lembrar de mim
@@ -181,16 +281,21 @@ export default function Login() {
 
           <button
             type="submit"
+            disabled={submitting}
             className="w-full rounded-full cursor-pointer bg-slate-900 py-3.5 text-sm font-bold text-white transition-colors hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
           >
-            {mode === "login" ? "Entrar" : "Criar minha conta"}
+            {submitting
+              ? "Aguarde..."
+              : mode === "login"
+                ? "Entrar"
+                : "Criar minha conta"}
           </button>
         </form>
 
         {notice && (
           <p
-            role="status"
-            className="mt-5 rounded-lg cursor-pointer bg-slate-100 px-4 py-3 text-sm text-slate-700"
+            role="alert"
+            className="mt-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700"
           >
             {notice}
           </p>
